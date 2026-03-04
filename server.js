@@ -14,6 +14,10 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("TalaSitio API Running...");
 });
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
+const dashboardRoutes = require("./routes/dashboardRoutes");
+app.use("/api/dashboard", dashboardRoutes);
 
 const PORT = process.env.PORT || 5000;
 
