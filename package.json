@@ -1,0 +1,30 @@
+{
+  "name": "talasitio",
+  "version": "1.0.0",
+  "description": "🏘️ TalaSitio\r A Web-Based Census and Information Update System for Sitio Communities\r 📌 Overview\r TalaSitio is a web-based census and resident information management system designed for small communities such as sitios and barangays.\r The system allows:\r Administrators to manage resident records\r Residents to request updates or corrections to their personal information\r Secure and organized storage of community data\r This project aims to improve efficiency, accuracy, and accessibility of local census records.",
+  "main": "index.js",
+  "scripts": {
+  "dev": "nodemon server.js",
+  "start": "node server.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iamedlin/TalaSitio.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iamedlin/TalaSitio/issues"
+  },
+  "homepage": "https://github.com/iamedlin/TalaSitio#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.2.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
