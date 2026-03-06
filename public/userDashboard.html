@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>User Dashboard</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f4f4;
+}
+
+.header{
+background:#2c7be5;
+color:white;
+padding:20px;
+display:flex;
+justify-content:space-between;
+}
+
+.container{
+padding:30px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:8px;
+margin-bottom:20px;
+}
+
+button{
+padding:10px;
+background:red;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+<h2>TalaSitio Resident Portal</h2>
+
+<button onclick="logout()">Logout</button>
+
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h3>Welcome Resident</h3>
+
+<p>You are logged in.</p>
+
+</div>
+
+</div>
+
+<script>
+
+const token = localStorage.getItem("token");
+
+if(!token){
+    window.location.href="login.html";
+}
+
+function logout(){
+
+    const confirmLogout = confirm("Do you want to log out?");
+
+    if(confirmLogout){
+        localStorage.removeItem("token");
+        window.location.href="login.html";
+    }
+
+}
+
+</script>
+
+</body>
+</html>
