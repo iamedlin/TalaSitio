@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Admin Dashboard</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+}
+
+.sidebar{
+width:200px;
+height:100vh;
+background:#2c3e50;
+color:white;
+position:fixed;
+}
+
+.sidebar h2{
+text-align:center;
+padding:20px;
+}
+
+.sidebar a{
+display:block;
+color:white;
+padding:15px;
+text-decoration:none;
+}
+
+.sidebar a:hover{
+background:#34495e;
+}
+
+.main{
+margin-left:200px;
+padding:30px;
+}
+
+button{
+padding:10px;
+background:red;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>TalaSitio</h2>
+
+<a href="#">Dashboard</a>
+<a href="#">Residents</a>
+<a href="#">Reports</a>
+
+<a href="#" onclick="logout()">Logout</a>
+
+</div>
+
+<div class="main">
+
+<h1>Admin Dashboard</h1>
+
+<p>Welcome Admin</p>
+
+</div>
+
+<script>
+
+const token = localStorage.getItem("token");
+
+if(!token){
+    window.location.href="login.html";
+}
+
+function logout(){
+
+    const confirmLogout = confirm("Do you want to log out?");
+
+    if(confirmLogout){
+        localStorage.removeItem("token");
+        window.location.href="login.html";
+    }
+
+}
+
+</script>
+
+</body>
+</html>

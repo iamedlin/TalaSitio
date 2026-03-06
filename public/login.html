@@ -1,106 +1,230 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>TalaSitio Login</title>
-    <style>
-        body{
-            font-family: Arial;
-            background:#f4f4f4;
-            display:flex;
-            justify-content:center;
-            align-items:center;
-            height:100vh;
-        }
+<title>TalaSitio Login</title>
 
-        .login-box{
-            background:white;
-            padding:30px;
-            border-radius:10px;
-            width:300px;
-            box-shadow:0 0 10px rgba(0,0,0,0.1);
-        }
+<style>
 
-        h2{
-            text-align:center;
-        }
+body{
+    font-family: Arial;
+    background:
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("images/bg.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    position: relative;
+}
 
-        input{
-            width:100%;
-            padding:10px;
-            margin:10px 0;
-        }
+.container{
+    width:900px;
+    height:450px;
+    background:white;
+    display:flex;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+}
 
-        button{
-            width:100%;
-            padding:10px;
-            background:#2c7be5;
-            color:white;
-            border:none;
-            cursor:pointer;
-        }
+/* LEFT SIDE */
+.left {
+    flex: 1;
+    background: linear-gradient(135deg, #1E3C72, #2A5298); 
+    color: white;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 
-        button:hover{
-            background:#1a5fd0;
-        }
+.left h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
 
-        .error{
-            color:red;
-            text-align:center;
-        }
-    </style>
+.left p {
+    opacity: 0.9;
+}
+
+/* RIGHT SIDE */
+.right{
+    flex:1;
+    padding:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.right h3{
+    text-align:center;
+    margin-bottom:20px;
+    color:#555;
+}
+
+input{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border-radius:20px;
+    border:1px solid #ddd;
+}
+
+button{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:20px;
+    background: linear-gradient(135deg, #1E3C72, #2A5298); 
+    color:white;
+    cursor:pointer;
+    margin-top:10px;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+.links{
+    display:flex;
+    justify-content:space-between;
+    font-size:12px;
+    margin-top:5px;
+}
+
+.links label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.links a{
+    text-decoration:none;
+    color:#777;
+}
+
+.links a:hover{
+    text-decoration:underline;
+}
+
+.error{
+    color:red;
+    text-align:center;
+    font-size:14px;
+}
+
+/* LOADING STYLE */
+#loading {
+    display: none; /* hidden by default */
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+}
+
+#loading img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    animation: rotate 1s linear infinite;
+}
+
+/* ROTATION ANIMATION */
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="login-box">
-    <h2>TalaSitio Login</h2>
+<!-- LOADING DIV -->
+<div id="loading">
+    <img src="images/loading.png" alt="Loading...">
+</div>
 
-    <div class="error" id="error"></div>
+<div class="container">
 
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="password" id="password" placeholder="Password" required>
+    <!-- LEFT SIDE -->
+    <div class="left">
+        <h1>Welcome to TalaSitio</h1>
+        <p>
+        Manage community information easily and securely.
+        Login to access your dashboard and manage records.
+        </p>
+    </div>
 
-    <button onclick="login()">Login</button>
+    <!-- RIGHT SIDE -->
+    <div class="right">
+
+        <h3>LOGIN</h3>
+
+        <div class="error" id="error"></div>
+
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="password" placeholder="Password" required>
+
+        <div class="links">
+            <label><input type="checkbox">Remember</label>
+            <a href="forgotPassword.html">Forgot password?</a>
+        </div>
+
+        <button onclick="login()">LOGIN</button>
+
+    </div>
+
 </div>
 
 <script>
-
 async function login(){
+    const loading = document.getElementById("loading");
+    const errorDiv = document.getElementById("error");
+
+    loading.style.display = "block"; // show loading
+    errorDiv.innerText = ""; // clear previous errors
 
     const email = document.getElementById("email").value;
     const password = document.getElementById("password").value;
 
-    const response = await fetch("http://localhost:5000/login",{
-        method:"POST",
-        headers:{
-            "Content-Type":"application/json"
-        },
-        body: JSON.stringify({
-            email: email,
-            password: password
-        })
-    });
+    try {
+        const response = await fetch("http://localhost:5000/login",{
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body: JSON.stringify({ email, password })
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if(response.ok){
+        // Wait 2 seconds
+        await new Promise(resolve => setTimeout(resolve, 2000));
 
-        // save token
-        localStorage.setItem("token", data.token);
+        if(response.ok){
+            localStorage.setItem("token", data.token);
 
-        // redirect depending on role
-        if(data.role === "admin"){
-            window.location.href = "adminDashboard.html";
-        }else{
-            window.location.href = "residentDashboard.html";
+            if(data.role === "admin"){
+                window.location.href = "adminDashboard.html";
+            } else {
+                window.location.href = "userDashboard.html";
+            }
+        } else {
+            errorDiv.innerText = data.message;
         }
 
-    }else{
-        document.getElementById("error").innerText = data.message;
+    } catch (error) {
+        errorDiv.innerText = "Server error. Try again.";
+    } finally {
+        loading.style.display = "none"; // hide loading
     }
 
 }
-
 </script>
 
 </body>
