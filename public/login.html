@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TalaSitio Login</title>
+    <style>
+        body{
+            font-family: Arial;
+            background:#f4f4f4;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+        }
+
+        .login-box{
+            background:white;
+            padding:30px;
+            border-radius:10px;
+            width:300px;
+            box-shadow:0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2{
+            text-align:center;
+        }
+
+        input{
+            width:100%;
+            padding:10px;
+            margin:10px 0;
+        }
+
+        button{
+            width:100%;
+            padding:10px;
+            background:#2c7be5;
+            color:white;
+            border:none;
+            cursor:pointer;
+        }
+
+        button:hover{
+            background:#1a5fd0;
+        }
+
+        .error{
+            color:red;
+            text-align:center;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="login-box">
+    <h2>TalaSitio Login</h2>
+
+    <div class="error" id="error"></div>
+
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+
+    <button onclick="login()">Login</button>
+</div>
+
+<script>
+
+async function login(){
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    const response = await fetch("http://localhost:5000/login",{
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body: JSON.stringify({
+            email: email,
+            password: password
+        })
+    });
+
+    const data = await response.json();
+
+    if(response.ok){
+
+        // save token
+        localStorage.setItem("token", data.token);
+
+        // redirect depending on role
+        if(data.role === "admin"){
+            window.location.href = "adminDashboard.html";
+        }else{
+            window.location.href = "residentDashboard.html";
+        }
+
+    }else{
+        document.getElementById("error").innerText = data.message;
+    }
+
+}
+
+</script>
+
+</body>
+</html>
