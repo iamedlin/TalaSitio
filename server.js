@@ -14,7 +14,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 const authRoutes = require("./routes/authRoutes");
-app.use("/", authRoutes);
+app.use("/api/auth", authRoutes);
+
 const dashboardRoutes = require("./routes/dashboardRoutes");
 app.use("/api/dashboard", dashboardRoutes);
 
