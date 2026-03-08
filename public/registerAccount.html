@@ -1,0 +1,159 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>TalaSitio Account Request</title>
+
+<style>
+
+body{
+font-family: Arial;
+background:#f4f6f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+}
+
+.container{
+background:white;
+padding:35px;
+width:350px;
+border-radius:10px;
+box-shadow:0 0 15px rgba(0,0,0,0.1);
+}
+
+h2{
+text-align:center;
+color:#2c7be5;
+}
+
+input{
+width:100%;
+padding:10px;
+margin:8px 0;
+border:1px solid #ccc;
+border-radius:5px;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#2c7be5;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1a5fd0;
+}
+
+.popup{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+justify-content:center;
+align-items:center;
+}
+
+.popup-box{
+background:white;
+padding:30px;
+border-radius:8px;
+text-align:center;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Request Account</h2>
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="number" id="age" placeholder="Age">
+<input type="text" id="phone" placeholder="Cellphone Number">
+<input type="email" id="email" placeholder="Email">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="submitRequest()">Submit Request</button>
+
+</div>
+
+<div class="popup" id="popup">
+
+<div class="popup-box">
+
+<h3>Validation ongoing</h3>
+<p>We will contact you.</p>
+
+<button onclick="closePopup()">OK</button>
+
+</div>
+
+</div>
+
+<script>
+
+async function submitRequest(){
+
+    const name = document.getElementById("name").value;
+    const age = document.getElementById("age").value;
+    const phone = document.getElementById("phone").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+        const res = await fetch("/api/auth/request-account", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                name,
+                age,
+                phone,
+                email,
+                password
+            })
+        });
+
+        const data = await res.json();
+        console.log(data);
+
+        // optionally check for success/failure
+        if (!res.ok) {
+            // handle server-side validation errors
+            alert(data.message || 'Request failed');
+            return;
+        }
+
+        document.getElementById("popup").style.display = "flex";
+    } catch (err) {
+        console.error(err);
+        alert('Unable to submit request. Please try again later.');
+    }
+}
+
+function closePopup(){
+
+document.getElementById("popup").style.display="none";
+window.location.href="login.html";
+
+}
+
+</script>
+
+</body>
+</html>
