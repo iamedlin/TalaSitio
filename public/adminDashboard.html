@@ -2,22 +2,19 @@
 <html>
 <head>
 
-<title>TalaSitio Admin</title>
+<title>Admin Dashboard</title>
 
 <style>
 
 body{
 font-family:Arial;
 margin:0;
-background:#f4f6f9;
 }
 
-/* SIDEBAR */
-
 .sidebar{
-width:220px;
+width:200px;
 height:100vh;
-background:#1e3a5f;
+background:#2c3e50;
 color:white;
 position:fixed;
 }
@@ -25,7 +22,6 @@ position:fixed;
 .sidebar h2{
 text-align:center;
 padding:20px;
-border-bottom:1px solid rgba(255,255,255,0.2);
 }
 
 .sidebar a{
@@ -36,55 +32,40 @@ text-decoration:none;
 }
 
 .sidebar a:hover{
-background:#294a73;
+background:#34495e;
 }
-
-/* MAIN */
 
 .main{
-margin-left:220px;
-}
-
-/* TOPBAR */
-
-.topbar{
-height:60px;
-background:white;
-display:flex;
-justify-content:flex-end;
-align-items:center;
-padding:0 20px;
-box-shadow:0 2px 5px rgba(0,0,0,0.1);
-}
-
-.profile{
-display:flex;
-align-items:center;
-gap:10px;
-}
-
-/* CONTENT */
-
-.content{
+margin-left:200px;
 padding:30px;
 }
 
-.cards{
-display:flex;
-gap:20px;
+button{
+padding:10px;
+background:red;
+border:none;
+color:white;
+cursor:pointer;
 }
 
-.card{
-background:white;
-padding:20px;
-border-radius:10px;
-width:200px;
-box-shadow:0 2px 8px rgba(0,0,0,0.1);
+/* Notification button styles */
+.notification-btn {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1000;
 }
 
-.card h3{
-margin:0;
-color:#1e3a5f;
+.notification-btn:hover {
+    background: #2980b9;
 }
 
 </style>
@@ -93,6 +74,29 @@ color:#1e3a5f;
 
 <body>
 
+<!-- Notification button -->
+<button class="notification-btn" onclick="toggleRequests()">🔔</button>
+
+<div id="requestBox" style="
+display:none;
+position:fixed;
+top:60px;
+right:10px;
+background:white;
+width:300px;
+max-height:400px;
+overflow:auto;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+padding:10px;
+border-radius:5px;
+">
+
+<h3>Account Requests</h3>
+
+<div id="requestList"></div>
+
+</div>
+
 <div class="sidebar">
 
 <h2>TalaSitio</h2>
@@ -100,83 +104,74 @@ color:#1e3a5f;
 <a href="#">Dashboard</a>
 <a href="#">Residents</a>
 <a href="#">Reports</a>
-<a href="#">Settings</a>
 
 <a href="#" onclick="logout()">Logout</a>
 
 </div>
 
-
 <div class="main">
-
-<div class="topbar">
-
-<div class="profile">
-🔔 Admin
-</div>
-
-</div>
-
-
-<div class="content">
 
 <h1>Admin Dashboard</h1>
 
 <p>Welcome Admin</p>
 
-<div class="cards">
-
-<div class="card">
-<h3>Residents</h3>
-<p>120</p>
 </div>
-
-<div class="card">
-<h3>Reports</h3>
-<p>15</p>
-</div>
-
-<div class="card">
-<h3>Announcements</h3>
-<p>4</p>
-</div>
-
-</div>
-
-</div>
-
-</div>
-
 
 <script>
 
-/* CHECK LOGIN */
+const token = localStorage.getItem("token");
 
-const token=localStorage.getItem("token");
-const role=localStorage.getItem("role");
-
-if(!token || role!=="admin"){
-
-alert("Access denied");
-window.location.href="login.html";
-
+if(!token){
+    window.location.href="login.html";
 }
-
-/* LOGOUT */
 
 function logout(){
 
-const confirmLogout=confirm("Do you want to logout?");
+    const confirmLogout = confirm("Do you want to log out?");
 
-if(confirmLogout){
-
-localStorage.removeItem("token");
-localStorage.removeItem("role");
-
-window.location.href="login.html";
+    if(confirmLogout){
+        localStorage.removeItem("token");
+        window.location.href="login.html";
+    }
 
 }
 
+function toggleRequests() {
+    const box = document.getElementById("requestBox");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+    if (box.style.display === "block") {
+        fetchRequests();
+    }
+}
+
+async function fetchRequests() {
+    try {
+        const response = await fetch("http://localhost:5000/account-requests", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        const requests = await response.json();
+        const list = document.getElementById("requestList");
+        list.innerHTML = "";
+        requests.forEach(req => {
+            const div = document.createElement("div");
+            div.innerHTML = `<p>${req.name} - ${req.email}</p><button onclick="approveRequest('${req._id}')">Approve</button>`;
+            list.appendChild(div);
+        });
+    } catch (error) {
+        console.error("Error fetching requests:", error);
+    }
+}
+
+async function approveRequest(id) {
+    try {
+        await fetch(`http://localhost:5000/approve-request/${id}`, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+        fetchRequests(); // Refresh list
+    } catch (error) {
+        console.error("Error approving request:", error);
+    }
 }
 
 </script>
