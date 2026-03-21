@@ -1,75 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-
-<title>Admin Dashboard</title>
-
-<style>
-
-body{
-font-family:Arial;
-margin:0;
-}
-
-.sidebar{
-width:200px;
-height:100vh;
-background:#2c3e50;
-color:white;
-position:fixed;
-}
-
-.sidebar h2{
-text-align:center;
-padding:20px;
-}
-
-.sidebar a{
-display:block;
-color:white;
-padding:15px;
-text-decoration:none;
-}
-
-.sidebar a:hover{
-background:#34495e;
-}
-
-.main{
-margin-left:200px;
-padding:30px;
-}
-
-button{
-padding:10px;
-background:red;
-border:none;
-color:white;
-cursor:pointer;
-}
-
-/* Notification button styles */
-.notification-btn {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 20px;
-    cursor: pointer;
-    z-index: 1000;
-}
-
-.notification-btn:hover {
-    background: #2980b9;
-}
-
-</style>
-
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -77,43 +10,43 @@ cursor:pointer;
 <!-- Notification button -->
 <button class="notification-btn" onclick="toggleRequests()">🔔</button>
 
-<div id="requestBox" style="
-display:none;
-position:fixed;
-top:60px;
-right:10px;
-background:white;
-width:300px;
-max-height:400px;
-overflow:auto;
-box-shadow:0 0 10px rgba(0,0,0,0.2);
-padding:10px;
-border-radius:5px;
-">
-
-<h3>Account Requests</h3>
-
-<div id="requestList"></div>
-
+<div id="requestBox" class="request-box">
+    <h3>Account Requests</h3>
+    <div id="requestList"></div>
 </div>
 
 <div class="sidebar">
+    <h2>TalaSitio</h2>
 
-<h2>TalaSitio</h2>
-
-<a href="#">Dashboard</a>
-<a href="#">Residents</a>
-<a href="#">Reports</a>
-
-<a href="#" onclick="logout()">Logout</a>
-
+    <a href="#">Dashboard</a>
+    <a href="#">Residents</a>
+    <a href="#">Reports</a>
+    <a href="#" onclick="logout()">Logout</a>
 </div>
 
 <div class="main">
 
-<h1>Admin Dashboard</h1>
+    <h1 id="dashboardTitle">Admin Dashboard</h1>
+    <p id="welcomeText">Welcome Admin</p>
 
-<p>Welcome Admin</p>
+    <!-- Sitio Buttons -->
+    <div class="sitio-container">
+        <button class="sitio-btn" onclick="goToSitio(1)">Sitio 1</button>
+        <button class="sitio-btn" onclick="goToSitio(2)">Sitio 2</button>
+        <button class="sitio-btn" onclick="goToSitio(3)">Sitio 3</button>
+        <button class="sitio-btn" onclick="goToSitio(4)">Sitio 4</button>
+        <button class="sitio-btn" onclick="goToSitio(5)">Sitio 5</button>
+    </div>
+
+    <!-- Dynamic Title -->
+    <h2 id="sitioTitle">Residents</h2>
+
+    <div id="sitioHeader" class="sitio-header">
+        Select a Sitio
+    </div>
+
+    <!-- Residents Display -->
+    <div id="residentList" class="resident-grid"></div>
 
 </div>
 
@@ -126,16 +59,24 @@ if(!token){
 }
 
 function logout(){
-
     const confirmLogout = confirm("Do you want to log out?");
-
     if(confirmLogout){
         localStorage.removeItem("token");
         window.location.href="login.html";
     }
-
 }
 
+// ❌ DELETE mo ito kung meron
+// function selectSitio(number){    
+//     alert("Selected Sitio " + number);
+// }
+
+// ✅ ITO ANG ILAGAY MO
+function goToSitio(number){
+    window.location.href = `sitio${number}.html`;
+}
+
+// existing functions mo
 function toggleRequests() {
     const box = document.getElementById("requestBox");
     box.style.display = box.style.display === "none" ? "block" : "none";
@@ -152,11 +93,16 @@ async function fetchRequests() {
         const requests = await response.json();
         const list = document.getElementById("requestList");
         list.innerHTML = "";
+
         requests.forEach(req => {
             const div = document.createElement("div");
-            div.innerHTML = `<p>${req.name} - ${req.email}</p><button onclick="approveRequest('${req._id}')">Approve</button>`;
+            div.innerHTML = `
+                <p>${req.name} - ${req.email}</p>
+                <button onclick="approveRequest('${req._id}')">Approve</button>
+            `;
             list.appendChild(div);
         });
+
     } catch (error) {
         console.error("Error fetching requests:", error);
     }
@@ -168,7 +114,7 @@ async function approveRequest(id) {
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` }
         });
-        fetchRequests(); // Refresh list
+        fetchRequests();
     } catch (error) {
         console.error("Error approving request:", error);
     }

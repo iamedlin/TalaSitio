@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sitio 1</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>TalaSitio</h2>
+    <a href="adminDashboard.html">Dashboard</a>
+</div>
+
+<!-- ✅ ADD THIS WRAPPER -->
+<div class="main">
+
+    <div class="top-bar">
+        <h1>🏡 Sitio 1 Dashboard</h1>
+        <button class="add-btn" onclick="window.location.href='addResident.html'">
+            + Add Resident
+        </button>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="card">
+            <h2>Residents</h2>
+
+            <!-- ✅ APPLY GRID HERE -->
+            <div id="residentList" class="resident-grid"></div>
+        </div>
+
+        <div class="card">
+            <h2>Population Chart</h2>
+            <canvas id="chartCanvas"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+<script>
+
+const token = localStorage.getItem("token");
+
+let chart; // global chart
+
+// ✅ CONTACT NUMBER (GLOBAL FIX if inputs exist)
+document.addEventListener("input", function(e){
+    if(e.target.id === "contact"){
+        e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0,11);
+    }
+});
+
+// ✅ CHART FUNCTION
+function renderChart(residents){
+
+    const ageGroups = {
+        "0-17": 0,
+        "18-35": 0,
+        "36-60": 0,
+        "60+": 0
+    };
+
+    residents.forEach(r => {
+        const age = r.head?.age || r.age;
+
+        if(age <= 17) ageGroups["0-17"]++;
+        else if(age <= 35) ageGroups["18-35"]++;
+        else if(age <= 60) ageGroups["36-60"]++;
+        else ageGroups["60+"]++;
+    });
+
+    const ctx = document.getElementById("chartCanvas");
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(ageGroups),
+            datasets: [{
+                data: Object.values(ageGroups)
+            }]
+        }
+    });
+}
+
+// ✅ LOAD RESIDENTS
+async function loadResidents(){
+    const container = document.getElementById("residentList");
+
+    container.innerHTML = "<p>Loading...</p>";
+
+    try {
+        const response = await fetch("http://localhost:5000/residents/sitio/1", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if(!response.ok){
+            throw new Error("Failed to fetch");
+        }
+
+        const residents = await response.json();
+
+        renderChart(residents);
+
+        container.innerHTML = "";
+
+        if(residents.length === 0){
+            container.innerHTML = "<p>No residents found.</p>";
+            return;
+        }
+
+        residents.forEach(res => {
+            const div = document.createElement("div");
+            div.classList.add("resident-card");
+
+            div.innerHTML = `
+                <h3>${res.head?.name || res.name || "No Name"}</h3>
+                <p>Age: ${res.head?.age || res.age || "N/A"}</p>
+                <p>Family Members: ${res.familyMembers?.length || 0}</p>
+
+                <button onclick="toggleFamily('${res._id}')">👨‍👩‍👧 View Family</button>
+                <button onclick="deleteResident('${res._id}')">❌ Remove</button>
+
+                <div id="family-${res._id}" style="display:none; margin-top:10px;"></div>
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch(err){
+        container.innerHTML = "<p>Error loading data</p>";
+        console.error(err);
+    }
+}
+
+loadResidents();
+
+// ✅ TOGGLE FAMILY VIEW
+function toggleFamily(id){
+    const container = document.getElementById(`family-${id}`);
+
+    if(container.style.display === "none"){
+        container.style.display = "block";
+
+        fetch("http://localhost:5000/residents/sitio/1", {
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const resident = data.find(r => r._id === id);
+
+            if(!resident.familyMembers || resident.familyMembers.length === 0){
+                container.innerHTML = "<p>No family members</p>";
+                return;
+            }
+
+            container.innerHTML = resident.familyMembers.map(m => `
+                <p>👤 ${m.name} (${m.relation}) - Age: ${m.age}</p>
+            `).join("");
+        });
+
+    } else {
+        container.style.display = "none";
+    }
+}
+
+// ✅ DELETE WITH CONFIRMATION
+async function deleteResident(id){
+
+    const confirmDelete = confirm("Are you sure you want to delete this resident?");
+
+    if(!confirmDelete) return;
+
+    try {
+        await fetch(`http://localhost:5000/residents/${id}`, {
+            method: "DELETE",
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        alert("Resident deleted!");
+        loadResidents();
+
+    } catch(err){
+        console.error(err);
+    }
+}
+
+</script>
+</body>
+</html>
