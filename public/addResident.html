@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Household</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="form-container">
+    <h1>👨‍👩‍👧 Add Household</h1>
+
+    <form id="residentForm">
+
+        <h2>Head of Family</h2>
+
+        <!-- NAME -->
+        <div class="row">
+            <input type="text" id="firstName" placeholder="First Name" required>
+            <input type="text" id="middleName" placeholder="Middle Name" required>
+            <input type="text" id="lastName" placeholder="Last Name" required>
+        </div>
+
+        <!-- BIRTHDATE -->
+        <label>Birthdate:</label>
+        <input type="date" id="birthdate" required>
+
+        <!-- AGE AUTO -->
+        <input type="number" id="age" placeholder="Age" readonly>
+
+        <!-- GENDER -->
+        <select id="gender" required>
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+            <option>Other</option>
+        </select>
+
+        <!-- CIVIL STATUS -->
+        <select id="civilStatus" required>
+            <option value="">Civil Status</option>
+            <option>Single</option>
+            <option>Married</option>
+            <option>Widowed</option>
+            <option>Separated</option>
+        </select>
+
+        <!-- OTHER FIELDS -->
+        <input type="text" id="nationality" placeholder="Nationality" required>
+        <input type="text" id="contact" placeholder="Contact Number" required>
+        <input type="text" id="work" placeholder="Occupation" required>
+        <input type="text" id="socialClass" placeholder="Social Class" required>
+        <input type="text" id="religion" placeholder="Religion" required>
+
+        <h2>Family Members</h2>
+
+        <div id="familyContainer"></div>
+
+        <button type="button" onclick="addFamilyMember()">+ Add Member</button>
+
+        <br><br>
+
+        <button type="submit" class="save-btn">💾 Save Household</button>
+
+    </form>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+
+/* AUTO COMPUTE AGE */
+document.getElementById("birthdate").addEventListener("change", function () {
+    const birthdate = new Date(this.value);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthdate.getFullYear();
+    const m = today.getMonth() - birthdate.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
+        age--;
+    }
+
+    document.getElementById("age").value = age;
+});
+
+/* ADD FAMILY MEMBER */
+function addFamilyMember(){
+    const div = document.createElement("div");
+    div.classList.add("family-member");
+
+    div.innerHTML = `
+        <div class="row">
+            <input type="text" placeholder="First Name" class="memberFirst" required>
+            <input type="text" placeholder="Middle Name" class="memberMiddle" required>
+            <input type="text" placeholder="Last Name" class="memberLast" required>
+        </div>
+
+        <input type="number" placeholder="Age" class="memberAge" required>
+        <input type="text" placeholder="Relation (Son, Wife...)" class="memberRelation" required>
+
+        <button type="button" class="removeBtn">❌ Remove</button>
+        <hr>
+    `;
+
+    document.getElementById("familyContainer").appendChild(div);
+}
+
+/* SUBMIT */
+document.getElementById("residentForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const members = [];
+
+    document.querySelectorAll(".family-member").forEach(m => {
+        members.push({
+            name: `${m.querySelector(".memberFirst").value} ${m.querySelector(".memberMiddle").value} ${m.querySelector(".memberLast").value}`,
+            age: m.querySelector(".memberAge").value,
+            relation: m.querySelector(".memberRelation").value
+        });
+    });
+
+    const fullName = `${document.getElementById("firstName").value} ${document.getElementById("middleName").value} ${document.getElementById("lastName").value}`;
+
+    const data = {
+        head: {
+            name: fullName,
+            age: document.getElementById("age").value,
+            gender: document.getElementById("gender").value,
+            civilStatus: document.getElementById("civilStatus").value,
+            contact: document.getElementById("contact").value,
+            work: document.getElementById("work").value,
+            socialClass: document.getElementById("socialClass").value,
+            religion: document.getElementById("religion").value,
+            nationality: document.getElementById("nationality").value
+        },
+        familyMembers: members,
+        sitio: "1"
+    };
+
+    try {
+        await fetch("http://localhost:5000/residents", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        alert("Saved successfully!");
+        window.location.href = "sitio1.html";
+
+    } catch(err){
+        console.error(err);
+    }
+});
+</script>
+
+</body>
+</html>
