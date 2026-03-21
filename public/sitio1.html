@@ -175,14 +175,25 @@ function toggleFamily(id){
 async function deleteResident(id){
 
     const confirmDelete = confirm("Are you sure you want to delete this resident?");
-
     if(!confirmDelete) return;
 
     try {
-        await fetch(`http://localhost:5000/residents/${id}`, {
+
+        const res = await fetch(`http://localhost:5000/residents/${id}`, {
             method: "DELETE",
-            headers: { "Authorization": `Bearer ${token}` }
+            headers: { 
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
         });
+
+        const data = await res.json();
+        console.log(data);
+
+        if(!res.ok){
+            alert("Delete failed!");
+            return;
+        }
 
         alert("Resident deleted!");
         loadResidents();

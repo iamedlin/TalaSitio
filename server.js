@@ -57,7 +57,7 @@ app.post("/residents", async (req, res) => {
         res.status(500).json({ message: "Error saving resident" });
     }
 });
-app.delete("/residents/:id", protect, async (req, res) => {
+app.delete("/residents/:id", async (req, res) => {
     try {
         const id = req.params.id;
 
