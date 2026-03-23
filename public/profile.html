@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Resident Profile</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+
+<body>
+
+<div class="profile-container">
+
+    <!-- HEADER -->
+    <div class="profile-header">
+        <h1 id="fullName">Loading...</h1>
+        <div>
+            <button onclick="goBack()">⬅ Back</button>
+            <button onclick="editProfile()" class="edit-btn">Edit</button>
+        </div>
+    </div>
+
+    <!-- USER INFO -->
+    <div class="profile-card">
+        <h3>USER INFORMATION</h3>
+        <div id="userInfo"></div>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="profile-card">
+        <h3>CONTACT INFORMATION</h3>
+        <div id="contactInfo"></div>
+    </div>
+
+    <!-- FAMILY -->
+    <div class="profile-card">
+        <h3>FAMILY MEMBERS</h3>
+        <div id="familyList"></div>
+    </div>
+
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+async function loadProfile(){
+
+    const res = await fetch("http://localhost:5000/residents/sitio/1", {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    const resident = data.find(r => r._id === id);
+
+    if(!resident) return;
+
+    const head = resident.head;
+
+    document.getElementById("fullName").innerText = head.name;
+
+    // USER INFO
+    document.getElementById("userInfo").innerHTML = `
+        <p><b>Age:</b> ${head.age || "-"}</p>
+        <p><b>Gender:</b> ${head.gender || "-"}</p>
+        <p><b>Civil Status:</b> ${head.civilStatus || "-"}</p>
+        <p><b>Birthdate:</b> ${head.birthdate ? new Date(head.birthdate).toLocaleDateString() : "-"}</p>
+       <p><b>Occupation:</b> ${head.occupation || "-"} </p>
+      `;
+
+    // CONTACT
+    document.getElementById("contactInfo").innerHTML = `
+         <p><b>Contact:</b> ${head.contact || "-"}</p>
+        <p><b>Email:</b> ${head.email || "-"}</p>
+    `;
+
+    // FAMILY (FULL DETAILS)
+    document.getElementById("familyList").innerHTML =
+        resident.familyMembers.map((m, index) => `
+            <div class="family-card">
+                <p><b>Name:</b> ${m.name}</p>
+                <p><b>Relation:</b> ${m.relation}</p>
+                <p><b>Age:</b> ${m.age}</p>
+                <p><b>Occupation:</b> ${m.occupation || "-"}</p>
+            </div>
+        `).join("");
+}
+
+function editProfile(){
+    window.location.href = `editResident.html?id=${id}`;
+}
+
+function goBack(){
+    window.location.href = "sitio1.html";
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>

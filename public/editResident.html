@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Resident</title>
+    <link rel="stylesheet" href="style2.css">
+</head>
+
+<body>
+
+<div class="profile-container">
+
+    <div class="profile-header">
+        <h1>Edit Resident</h1>
+    </div>
+
+    <div class="profile-card">
+
+        <h3>HEAD INFORMATION</h3>
+
+        <!-- NAME -->
+        <input id="name" placeholder="Full Name"><br><br>
+
+        <!-- BIRTHDATE + AGE -->
+        <input id="birthdate" type="date"><br><br>
+        <input id="age" type="number" readonly placeholder="Age"><br><br>
+
+        <!-- BASIC -->
+        <input id="gender" placeholder="Gender"><br><br>
+        <input id="civilStatus" placeholder="Civil Status"><br><br>
+        <input id="nationality" placeholder="Nationality"><br><br>
+
+        <!-- CONTACT -->
+        <input id="contact" placeholder="Contact"><br><br>
+        <input id="email" placeholder="Email"><br><br>
+
+        <!-- OTHER -->
+        <input id="occupation" placeholder="Occupation"><br><br>
+        <input id="socialClass" placeholder="Social Class"><br><br>
+        <input id="religion" placeholder="Religion"><br><br>
+
+        <h3>FAMILY MEMBERS</h3>
+
+<div id="familyContainer"></div>
+
+<button type="button" onclick="addFamilyMember()">+ Add Member</button>
+
+        <button onclick="saveChanges()">💾 Save</button>
+
+    </div>
+
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+let residentData;
+
+/* AUTO AGE */
+document.getElementById("birthdate").addEventListener("change", function () {
+    const birthdate = new Date(this.value);
+    const today = new Date();
+
+    let age = today.getFullYear() - birthdate.getFullYear();
+    const m = today.getMonth() - birthdate.getMonth();
+
+    if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
+        age--;
+    }
+
+    document.getElementById("age").value = age;
+});
+
+/* LOAD DATA */
+async function loadData(){
+
+    const res = await fetch("http://localhost:5000/residents/sitio/1", {
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    residentData = data.find(r => r._id === id);
+
+    const head = residentData.head;
+
+    // HEAD FIELDS
+    document.getElementById("name").value = head.name || "";
+    document.getElementById("birthdate").value = head.birthdate || "";
+    document.getElementById("age").value = head.age || "";
+    document.getElementById("gender").value = head.gender || "";
+    document.getElementById("civilStatus").value = head.civilStatus || "";
+    document.getElementById("nationality").value = head.nationality || "";
+    document.getElementById("contact").value = head.contact || "";
+    document.getElementById("email").value = head.email || "";
+    document.getElementById("occupation").value = head.occupation || "";
+    document.getElementById("socialClass").value = head.socialClass || "";
+    document.getElementById("religion").value = head.religion || "";
+
+    // FAMILY LOAD 🔥
+    const container = document.getElementById("familyContainer");
+    container.innerHTML = "";
+
+    if(residentData.familyMembers){
+        residentData.familyMembers.forEach(m => {
+            addFamilyMember(m);
+        });
+    }
+}
+
+/* SAVE */
+async function saveChanges(){
+
+    const members = [];
+
+    document.querySelectorAll(".family-member").forEach(m => {
+        members.push({
+            name: m.querySelector(".memberName").value,
+            birthdate: m.querySelector(".memberBirthdate").value,
+            age: m.querySelector(".memberAge").value,
+            relation: m.querySelector(".memberRelation").value,
+            occupation: m.querySelector(".memberOccupation").value
+        });
+    });
+
+    const updated = {
+        head: {
+            name: document.getElementById("name").value,
+            birthdate: document.getElementById("birthdate").value,
+            age: document.getElementById("age").value,
+            gender: document.getElementById("gender").value,
+            civilStatus: document.getElementById("civilStatus").value,
+            nationality: document.getElementById("nationality").value,
+            contact: document.getElementById("contact").value,
+            email: document.getElementById("email").value,
+            occupation: document.getElementById("occupation").value,
+            socialClass: document.getElementById("socialClass").value,
+            religion: document.getElementById("religion").value
+        },
+        familyMembers: members
+    };
+
+const res = await fetch(`http://localhost:5000/residents/${id}`, {
+    method: "PUT",
+    headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(updated)
+});
+
+if (!res.ok) {
+    const err = await res.text();
+    alert("Update failed: " + err);
+    return;
+}
+
+alert("Updated successfully!");
+window.location.href = `profile.html?id=${id}`;
+}
+
+function addFamilyMember(data = null){
+
+    const div = document.createElement("div");
+    div.classList.add("family-member");
+
+    div.innerHTML = `
+        <div class="row">
+            <input class="memberName" placeholder="Full Name" value="${data?.name || ""}">
+            <input type="date" class="memberBirthdate" value="${data?.birthdate || ""}">
+            <input type="number" class="memberAge" placeholder="Age" value="${data?.age || ""}" readonly>
+        </div>
+
+        <div class="row">
+            <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
+            <input class="memberOccupation" placeholder="Occupation" value="${data?.occupation || ""}">
+        </div>
+
+        <button type="button" class="removeBtn">❌ Remove</button>
+        <hr>
+    `;
+
+    document.getElementById("familyContainer").appendChild(div);
+
+    // AUTO AGE
+    div.querySelector(".memberBirthdate").addEventListener("change", function () {
+        const birthdate = new Date(this.value);
+        const today = new Date();
+
+        let age = today.getFullYear() - birthdate.getFullYear();
+        const m = today.getMonth() - birthdate.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
+            age--;
+        }
+
+        div.querySelector(".memberAge").value = age;
+    });
+
+    // REMOVE
+    div.querySelector(".removeBtn").addEventListener("click", function () {
+        div.remove();
+    });
+}
+loadData();
+</script>
+
+</body>
+</html>
