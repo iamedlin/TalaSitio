@@ -5,21 +5,27 @@ const ResidentSchema = new mongoose.Schema({
     head: {
         name: { type: String, required: true },
         age: { type: Number, required: true },
+        birthdate: Date,
         gender: String,
         civilStatus: String,
         contact: String,
-        work: String,
+        email: String,
+        occupation: String,
         socialClass: String,
         religion: String
     },
 
-    familyMembers: [
-        {
-            name: String,
-            age: Number,
-            relation: String
-        }
-    ],
+   familyMembers: [
+    {
+        name: String,
+        age: Number,
+        gender: String,
+        relation: String,
+        civilStatus: String,
+        occupation: String,
+        birthdate: Date
+    }
+],
 
     sitio: {
         type: Number,

@@ -78,6 +78,21 @@ app.delete("/residents/:id", async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 });
+app.put("/residents/:id", async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const updatedResident = await Resident.findByIdAndUpdate(
+            id,
+            req.body,
+            { new: true } // returns updated data
+        );
+
+        res.json(updatedResident);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 
 
