@@ -63,20 +63,31 @@ app.post("/residents", async (req, res) => {
         const rawPassword = head.birthdate.replace(/-/g, ""); // ✅ improved
         const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-       try {
+        // ✅ DEBUG HERE
+console.log("HEAD:", head);
+console.log("NAME:", head.name);
+
+const name = head.name;
+
+if (!name) {
+    console.log("❌ NAME IS UNDEFINED!");
+    return res.status(400).json({ message: "Name is missing" });
+}
+
+try {
     await User.create({
-        name: head.name, // ✅ FIX
+        name,       // ✅ Use the variable we already defined
         email,
         password: hashedPassword
     });
-            console.log("USER CREATED");
-        } catch (err) {
-            if (err.code === 11000) {
-                console.log("User already exists");
-            } else {
-                throw err;
-            }
-        }
+    console.log("USER CREATED");
+} catch (err) {
+    if (err.code === 11000) {
+        console.log("User already exists");
+    } else {
+        throw err;
+    }
+}
 
         res.json({ message: "Saved successfully" });
 
@@ -89,17 +100,30 @@ app.delete("/residents/:id", async (req, res) => {
     try {
         const id = req.params.id;
 
-        console.log("DELETE REQUEST ID:", id);
+        // 1️⃣ Find the resident first
+        const resident = await Resident.findById(id);
 
-        const deleted = await Resident.findByIdAndDelete(id);
-
-        if (!deleted) {
+        if (!resident) {
             return res.status(404).json({ message: "Resident not found" });
         }
 
-        console.log("DELETED:", deleted);
+        // 2️⃣ Delete the resident
+        await Resident.findByIdAndDelete(id);
+        console.log("RESIDENT DELETED:", resident);
 
-        res.json({ message: "Resident deleted" });
+        // 3️⃣ Delete the user account linked to email
+        const email = resident.head.email;
+
+        if (email) {
+            const deletedUser = await User.findOneAndDelete({ email });
+            if (deletedUser) {
+                console.log("USER DELETED:", deletedUser.email);
+            } else {
+                console.log("No user found for this email");
+            }
+        }
+
+        res.json({ message: "Resident and linked user deleted successfully" });
 
     } catch (err) {
         console.error("DELETE ERROR:", err);
