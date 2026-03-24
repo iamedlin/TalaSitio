@@ -3,7 +3,11 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
+
+const EditRequest = require("./models/EditRequest");
+
 const authRoutes = require("./routes/authRoutes");
+
 
 dotenv.config();
 connectDB();
@@ -18,6 +22,93 @@ app.use("/api/auth", authRoutes);
 const Resident = require("./models/Resident");
 const User = require("./models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+
+// Login route
+app.post("/api/auth/login", async (req, res) => {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if(!user) return res.status(400).json({ message: "User not found" });
+
+    const match = await bcrypt.compare(password, user.password);
+    if(!match) return res.status(400).json({ message: "Incorrect password" });
+
+    // Include role in token
+    const token = jwt.sign(
+        { id: user._id, email: user.email, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+    );
+
+    // Send role in response
+    res.json({ token, role: user.role });
+});
+
+// Auth middleware
+function auth(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if(!authHeader) return res.status(401).json({ message: "No token" });
+
+    const token = authHeader.split(" ")[1];
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        res.status(401).json({ message: "Invalid token" });
+    }
+}
+
+// Current user route
+app.get("/api/auth/me", auth, async (req, res) => {
+    const user = await User.findById(req.user.id).select("-password");
+    res.json(user);
+});
+
+app.post("/edit-request", async (req, res) => {
+    try {
+        const { residentId, newData } = req.body;
+
+        const request = new EditRequest({
+            residentId,
+            newData
+        });
+
+        await request.save();
+
+        res.json({ message: "Request sent for approval" });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.get("/edit-requests", async (req, res) => {
+    const requests = await EditRequest.find();
+    res.json(requests);
+});
+
+app.put("/edit-request/approve/:id", async (req, res) => {
+    try {
+        const request = await EditRequest.findById(req.params.id);
+
+        if (!request) return res.status(404).json({ message: "Not found" });
+
+        // Apply changes
+        await Resident.findByIdAndUpdate(
+            request.residentId,
+            request.newData
+        );
+
+        request.status = "approved";
+        await request.save();
+
+        res.json({ message: "Approved & updated" });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 /* =========================
    GET ALL BY SITIO (FIXED)
@@ -96,9 +187,9 @@ app.post("/residents", async (req, res) => {
 app.put("/residents/:id", async (req, res) => {
     try {
         const updated = await Resident.findByIdAndUpdate(
-            req.params.id,
-            req.body,
-            { new: true }
+            req.params.id,  // use id from URL
+            { $set: req.body },  // update with body
+            { new: true } // return updated document
         );
 
         res.json(updated);
@@ -127,6 +218,23 @@ app.delete("/residents/:id", async (req, res) => {
         }
 
         res.json({ message: "Deleted" });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+app.get("/residents/by-email/:email", async (req, res) => {
+    try {
+        const resident = await Resident.findOne({
+            "head.email": req.params.email
+        });
+
+        if (!resident) {
+            return res.status(404).json({ message: "Resident not found" });
+        }
+
+        res.json(resident);
 
     } catch (err) {
         res.status(500).json({ message: err.message });
