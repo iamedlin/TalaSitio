@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
 
 dotenv.config();
 connectDB();
@@ -12,6 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/api/auth", authRoutes);
 
 const Resident = require("./models/Resident");
 const User = require("./models/User");
@@ -73,11 +75,12 @@ app.post("/residents", async (req, res) => {
         const rawPassword = head.birthdate.replace(/-/g, "");
         const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-        await User.create({
-            name: head.name,
-            email,
-            password: hashedPassword
-        });
+       await User.create({
+    name: head.name,
+    email,
+    password: hashedPassword,
+    role: "user" // ✅ ADD THIS
+});
 
         res.json({ message: "Saved successfully" });
 
