@@ -12,14 +12,6 @@
 
 <div class="sidebar">
     <h2>TalaSitio</h2>
-
-    <div class="sitio-buttons">
-        <button onclick="goSitio(1)">Sitio 1</button>
-        <button onclick="goSitio(2)">Sitio 2</button>
-        <button onclick="goSitio(3)">Sitio 3</button>
-        <button onclick="goSitio(4)">Sitio 4</button>
-        <button onclick="goSitio(5)">Sitio 5</button>
-    </div>
 </div>
 
 <div class="main">
@@ -90,13 +82,21 @@ if (sitioFromUrl) {
 }
 
 let sitioId = Number(localStorage.getItem("sitioId"));
+const sitioNames = {
+    1: "Marlane",
+    2: "Visayan Village",
+    3: "Poblacion",
+    4: "Roga",
+    5: "Paner",
+    6: "Pinagpala"
+};
 
 if (!sitioId) {
     sitioId = 1;
     localStorage.setItem("sitioId", sitioId);
 }
 
-document.getElementById("sitioTitle").innerText = "Sitio " + sitioId;
+document.getElementById("sitioTitle").innerText = sitioNames[sitioId] || "Sitio " + sitioId;
 
 /* ======================
    NAVIGATION
