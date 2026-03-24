@@ -1,11 +1,164 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sitio</title>
-    <link rel="stylesheet" href="style2.css">
+<meta charset="UTF-8">
+<title>TalaSitio Pro</title>
 
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+/* ===== THEME ===== */
+:root{
+    --bg:#f4f6f9;
+    --card:rgba(255,255,255,0.7);
+    --text:#1e293b;
+    --accent:#6366f1;
+    --danger:#ef4444;
+}
+
+body.dark{
+    --bg:#0f172a;
+    --card:#1e293b;
+    --text:#f1f5f9;
+}
+
+/* ===== GLOBAL ===== */
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Inter',sans-serif;
+}
+
+body{
+    display:flex;
+    background:var(--bg);
+    color:var(--text);
+    transition:0.3s;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+    width:240px;
+    height:100vh;
+    background:linear-gradient(180deg,#1e3a5f,#0f172a);
+    color:white;
+    padding:20px;
+}
+
+.sidebar h2{
+    text-align:center;
+}
+
+/* ===== MAIN ===== */
+.main{
+    flex:1;
+    padding:20px;
+}
+
+/* ===== TOP BAR ===== */
+.top-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.controls{
+    display:flex;
+    gap:10px;
+}
+
+button{
+    border:none;
+    padding:10px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+.add-btn{background:var(--accent);color:white;}
+.exit-btn{background:var(--danger);color:white;}
+.dark-btn{background:#111;color:white;}
+
+/* ===== SEARCH ===== */
+.search{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    margin-bottom:15px;
+}
+
+/* ===== STATS ===== */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.card{
+    background:var(--card);
+    backdrop-filter:blur(10px);
+    padding:20px;
+    border-radius:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+/* ===== GRID ===== */
+.grid{
+    display:grid;
+    grid-template-columns:2fr 1fr;
+    gap:20px;
+}
+
+/* ===== RESIDENT ===== */
+.residents{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
+    gap:15px;
+}
+
+.resident{
+    background:var(--card);
+    backdrop-filter:blur(10px);
+    padding:15px;
+    border-radius:12px;
+}
+
+.resident:hover{
+    transform:translateY(-4px);
+}
+
+/* ===== BUTTONS ===== */
+.actions{
+    margin-top:10px;
+    display:flex;
+    gap:8px;
+}
+
+.view{background:#3b82f6;color:white;}
+.delete{background:#ef4444;color:white;}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+    .grid{grid-template-columns:1fr;}
+    .sidebar{display:none;}
+}
+
+</style>
 </head>
 
 <body>
@@ -16,276 +169,191 @@
 
 <div class="main">
 
-    <div class="top-bar">
-        <h1 id="sitioTitle">Sitio</h1>
+<div class="top-bar">
+    <h1 id="sitioTitle">Sitio</h1>
 
-        <div style="display:flex; gap:10px;">
-            <button onclick="goAddResident()">+ Add Resident</button>
-            <button onclick="goBack()">⬅ Exit</button>
-        </div>
+    <div class="controls">
+        <button class="add-btn" onclick="goAddResident()">+ Add</button>
+        <button class="dark-btn" onclick="toggleDark()">🌙</button>
+        <button class="exit-btn" onclick="goBack()">Exit</button>
     </div>
+</div>
 
-    <!-- STATS -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <h4>Population</h4>
-            <h2 id="totalPopulation">0</h2>
-        </div>
+<input class="search" placeholder="🔍 Search residents..." oninput="filterResidents(this.value)">
 
-        <div class="stat-card">
-            <h4>Senior Citizens</h4>
-            <h2 id="seniorCount">0</h2>
-        </div>
+<div class="stats">
+    <div class="card"><h4>Population</h4><h2 id="totalPopulation">0</h2></div>
+    <div class="card"><h4>Senior</h4><h2 id="seniorCount">0</h2></div>
+    <div class="card"><h4>Unemployed</h4><h2 id="unemployedCount">0</h2></div>
+    <div class="card"><h4>Out of School</h4><h2 id="outOfSchool">0</h2></div>
+</div>
 
-        <div class="stat-card">
-            <h4>Unemployed</h4>
-            <h2 id="unemployedCount">0</h2>
-        </div>
+<div class="grid">
 
-        <div class="stat-card">
-            <h4>Out of School</h4>
-            <h2 id="outOfSchool">0</h2>
-        </div>
-    </div>
+<div class="card">
+    <h2>Residents</h2>
+    <div id="residentList" class="residents"></div>
+</div>
 
-    <div class="dashboard-grid">
+<div class="card">
+    <h2>Population Chart</h2>
+    <canvas id="chartCanvas"></canvas>
+</div>
 
-        <div class="card">
-            <h2>Residents</h2>
-            <div id="residentList"></div>
-        </div>
-
-        <div class="card">
-            <h2>Population Chart</h2>
-            <canvas id="chartCanvas"></canvas>
-        </div>
-
-    </div>
+</div>
 
 </div>
 
 <script>
-
 const token = localStorage.getItem("token");
+let chart;
+let allResidents=[];
 
-/* ✅ FIX: declare chart */
-let chart = null;
-
-/* ======================
-   GET / SAVE SITIO
-====================== */
-const params = new URLSearchParams(window.location.search);
-const sitioFromUrl = params.get("sitio");
-
-if (sitioFromUrl) {
-    localStorage.setItem("sitioId", sitioFromUrl);
+/* DARK MODE */
+function toggleDark(){
+    document.body.classList.toggle("dark");
 }
 
-let sitioId = Number(localStorage.getItem("sitioId"));
-const sitioNames = {
-    1: "Marlane",
-    2: "Visayan Village",
-    3: "Poblacion",
-    4: "Roga",
-    5: "Paner",
-    6: "Pinagpala"
+/* SITIO */
+const params=new URLSearchParams(location.search);
+let sitioId=Number(params.get("sitio")||localStorage.getItem("sitioId")||1);
+localStorage.setItem("sitioId",sitioId);
+
+const sitioNames={
+1:"Marlane",2:"Visayan Village",3:"Poblacion",
+4:"Roga",5:"Paner",6:"Pinagpala"
 };
 
-if (!sitioId) {
-    sitioId = 1;
-    localStorage.setItem("sitioId", sitioId);
-}
+sitioTitle.innerText=sitioNames[sitioId];
 
-document.getElementById("sitioTitle").innerText = sitioNames[sitioId] || "Sitio " + sitioId;
+/* NAV */
+function goBack(){location.href="adminDashboard.html";}
+function goAddResident(){location.href="addResident.html";}
+function viewProfile(id){location.href=`profile.html?id=${id}`;}
 
-/* ======================
-   NAVIGATION
-====================== */
-function goSitio(id){
-    localStorage.setItem("sitioId", id);
-    window.location.href = `sitio.html?sitio=${id}`;
-}
+/* SEARCH (FIXED) */
+function filterResidents(search){
+    const words=search.toLowerCase().split(" ");
 
-function goBack(){
-    window.location.href = "adminDashboard.html";
-}
+    const filtered=allResidents.filter(r=>{
+        const head=r.head||{};
+        const fullName=[
+            head.firstName,
+            head.middleName,
+            head.lastName,
+            head.name
+        ].filter(Boolean).join(" ").toLowerCase();
 
-function goAddResident(){
-    window.location.href = "addResident.html";
-}
-
-function viewProfile(id){
-    window.location.href = `profile.html?id=${id}`;
-}
-
-/* ======================
-   CHART
-====================== */
-function renderChart(residents){
-
-    const ageGroups = {
-        "0-17": 0,
-        "18-35": 0,
-        "36-60": 0,
-        "60+": 0
-    };
-
-    residents.forEach(r => {
-
-        if (r.head?.age != null) {
-            const age = r.head.age;
-
-            if(age <= 17) ageGroups["0-17"]++;
-            else if(age <= 35) ageGroups["18-35"]++;
-            else if(age <= 60) ageGroups["36-60"]++;
-            else ageGroups["60+"]++;
-        }
-
-        r.familyMembers?.forEach(m => {
-
-            if(m.age == null) return;
-
-            const age = m.age;
-
-            if(age <= 17) ageGroups["0-17"]++;
-            else if(age <= 35) ageGroups["18-35"]++;
-            else if(age <= 60) ageGroups["36-60"]++;
-            else ageGroups["60+"]++;
-        });
-
+        return words.every(w=>fullName.includes(w));
     });
 
-    const ctx = document.getElementById("chartCanvas");
+    renderResidents(filtered);
+}
+
+/* CHART */
+function renderChart(data){
+    const g={"0-17":0,"18-35":0,"36-60":0,"60+":0};
+
+    data.forEach(r=>{
+        [r.head,...(r.familyMembers||[])].forEach(p=>{
+            if(!p||!p.age) return;
+            if(p.age<=17) g["0-17"]++;
+            else if(p.age<=35) g["18-35"]++;
+            else if(p.age<=60) g["36-60"]++;
+            else g["60+"]++;
+        });
+    });
 
     if(chart) chart.destroy();
 
-    chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: Object.keys(ageGroups),
-            datasets: [{
-                data: Object.values(ageGroups)
+    chart=new Chart(chartCanvas,{
+        type:"doughnut",
+        data:{
+            labels:Object.keys(g),
+            datasets:[{
+                data:Object.values(g),
+                backgroundColor:["#60a5fa","#34d399","#fbbf24","#f87171"]
             }]
         }
     });
 }
 
-/* ======================
-   LOAD RESIDENTS
-====================== */
-async function loadResidents(){
+/* RENDER */
+function renderResidents(data){
+    const c=residentList;
+    c.innerHTML="";
 
-    const container = document.getElementById("residentList");
-    container.innerHTML = "Loading...";
-
-    try {
-
-        const res = await fetch(`http://localhost:5000/residents/sitio/${sitioId}`, {
-            headers: { 
-                "Authorization": `Bearer ${token}` 
-            }
-        });
-
-        const residents = await res.json();
-
-        let totalPopulation = 0;
-        let seniorCount = 0;
-        let unemployedCount = 0;
-        let outOfSchool = 0;
-
-        residents.forEach(r => {
-
-            if (r.head) {
-                totalPopulation++;
-
-                const age = r.head.age;
-
-                if (age >= 60) seniorCount++;
-
-                if (!r.head.occupation || r.head.occupation.trim() === "") {
-                    unemployedCount++;
-
-                    if (age >= 6 && age <= 24) {
-                        outOfSchool++;
-                    }
-                }
-            }
-
-            r.familyMembers?.forEach(m => {
-
-                totalPopulation++;
-
-                const age = m.age;
-
-                if (age >= 60) seniorCount++;
-
-                if (!m.occupation || m.occupation.trim() === "") {
-                    unemployedCount++;
-
-                    if (age >= 6 && age <= 24) {
-                        outOfSchool++;
-                    }
-                }
-            });
-
-        });
-
-        document.getElementById("totalPopulation").innerText = totalPopulation;
-        document.getElementById("seniorCount").innerText = seniorCount;
-        document.getElementById("unemployedCount").innerText = unemployedCount;
-        document.getElementById("outOfSchool").innerText = outOfSchool;
-
-        renderChart(residents);
-
-        container.innerHTML = "";
-
-        if (!residents.length) {
-            container.innerHTML = "<p>No residents found</p>";
-            return;
-        }
-
-        residents.forEach(res => {
-
-            const div = document.createElement("div");
-
-            div.innerHTML = `
-                <h3>${res.head?.name || "No Name"}</h3>
-                <p>Age: ${res.head?.age || "N/A"}</p>
-                <p>Family: ${res.familyMembers?.length || 0}</p>
-
-                <button onclick="viewProfile('${res._id}')">View Family</button>
-                <button onclick="deleteResident('${res._id}')">Remove</button>
-            `;
-
-            container.appendChild(div);
-        });
-
-    } catch(err){
-        console.error(err);
-        container.innerHTML = "<p>Error loading data</p>";
+    if(!data.length){
+        c.innerHTML="<p>No residents found</p>";
+        return;
     }
+
+    data.forEach(r=>{
+        const div=document.createElement("div");
+        div.className="resident";
+
+        div.innerHTML=`
+            <h3>${r.head?.name||"No Name"}</h3>
+            <p>Age: ${r.head?.age||"N/A"}</p>
+            <p>Family: ${r.familyMembers?.length||0}</p>
+
+            <div class="actions">
+                <button class="view" onclick="viewProfile('${r._id}')">View</button>
+                <button class="delete" onclick="deleteResident('${r._id}')">Delete</button>
+            </div>
+        `;
+
+        c.appendChild(div);
+    });
 }
 
-/* ======================
-   DELETE
-====================== */
+/* LOAD */
+async function loadResidents(){
+    const res=await fetch(`http://localhost:5000/residents/sitio/${sitioId}`,{
+        headers:{Authorization:`Bearer ${token}`}
+    });
+
+    const data=await res.json();
+    allResidents=data;
+
+    let t=0,s=0,u=0,o=0;
+
+    data.forEach(r=>{
+        [r.head,...(r.familyMembers||[])].forEach(p=>{
+            if(!p) return;
+            t++;
+
+            if(p.age>=60) s++;
+
+            if(!p.occupation){
+                u++;
+                if(p.age>=6 && p.age<=24) o++;
+            }
+        });
+    });
+
+    totalPopulation.innerText=t;
+    seniorCount.innerText=s;
+    unemployedCount.innerText=u;
+    outOfSchool.innerText=o;
+
+    renderChart(data);
+    renderResidents(data);
+}
+
+/* DELETE */
 async function deleteResident(id){
+    if(!confirm("Delete?")) return;
 
-    if(!confirm("Delete this resident?")) return;
-
-    await fetch(`http://localhost:5000/residents/${id}`, {
-        method: "DELETE",
-        headers: { 
-            "Authorization": `Bearer ${token}` 
-        }
+    await fetch(`http://localhost:5000/residents/${id}`,{
+        method:"DELETE",
+        headers:{Authorization:`Bearer ${token}`}
     });
 
     loadResidents();
 }
 
-/* INIT */
 loadResidents();
-
 </script>
 
 </body>
