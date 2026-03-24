@@ -147,3 +147,15 @@ button {
     border-radius: 8px;
     margin-bottom: 10px;
 }
+.exit-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.exit-btn:hover {
+    background: #5a6268;
+}
