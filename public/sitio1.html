@@ -17,12 +17,20 @@
 
 <div class="main">
 
-    <div class="top-bar">
-        <h1>🏡 Sitio 1 Dashboard</h1>
-        <button class="add-btn" onclick="window.location.href='addResident.html'">
+   <div class="top-bar">
+    <h1>🏡 Sitio 1 Dashboard</h1>
+
+    <div style="display:flex; gap:10px;">
+        <button class="add-btn"
+            onclick="window.location.href='addResident.html'">
             + Add Resident
         </button>
+
+        <button class="exit-btn" onclick="goBack()">
+            ⬅ Exit
+        </button>
     </div>
+</div>
 
     <!-- 🔵 STATS -->
     <div class="stats-grid">
@@ -71,7 +79,9 @@ let chart;
 function viewProfile(id){
     window.location.href = `profile.html?id=${id}`;
 }
-
+function goBack() {
+    window.location.href = "adminDashboard.html";
+}
 /* CHART */
 function renderChart(residents){
 
