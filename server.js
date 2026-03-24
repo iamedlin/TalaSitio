@@ -35,20 +35,48 @@ app.get("/residents/sitio/:number", async (req, res) => {
     }
 });
 
+const bcrypt = require("bcryptjs");
+const User = require("./models/User");
+
 app.post("/residents", async (req, res) => {
     try {
         console.log("POST HIT");
         console.log("BODY:", req.body);
 
+        const { head, familyMembers, sitio } = req.body;
+
+        if (!head.email) {
+            return res.status(400).json({ message: "Email is required" });
+        }
+
+        // 1. SAVE RESIDENT
         const newResident = new Resident({
-            head: req.body.head,
-            familyMembers: req.body.familyMembers || [],
-            sitio: Number(req.body.sitio)
+            head,
+            familyMembers: familyMembers || [],
+            sitio: String(sitio) // ✅ FIXED
         });
 
         await newResident.save();
 
-        console.log("SAVED:", newResident);
+        // 2. CREATE USER ACCOUNT
+        const email = head.email;
+        const rawPassword = head.birthdate.replace(/-/g, ""); // ✅ improved
+        const hashedPassword = await bcrypt.hash(rawPassword, 10);
+
+       try {
+    await User.create({
+        name: head.name, // ✅ FIX
+        email,
+        password: hashedPassword
+    });
+            console.log("USER CREATED");
+        } catch (err) {
+            if (err.code === 11000) {
+                console.log("User already exists");
+            } else {
+                throw err;
+            }
+        }
 
         res.json({ message: "Saved successfully" });
 
