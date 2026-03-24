@@ -8,7 +8,6 @@
 <body>
 
 <div class="profile-container">
-
     <div class="profile-header">
         <h1>Edit Resident</h1>
     </div>
@@ -17,74 +16,55 @@
 
         <h3>HEAD INFORMATION</h3>
 
-        <!-- NAME -->
         <input id="name" placeholder="Full Name"><br><br>
-
-        <!-- BIRTHDATE + AGE -->
         <input id="birthdate" type="date"><br><br>
-        <input id="age" type="number" readonly placeholder="Age"><br><br>
+        <input id="age" type="number" readonly><br><br>
 
-        <!-- BASIC -->
         <input id="gender" placeholder="Gender"><br><br>
         <input id="civilStatus" placeholder="Civil Status"><br><br>
         <input id="nationality" placeholder="Nationality"><br><br>
 
-        <!-- CONTACT -->
         <input id="contact" placeholder="Contact"><br><br>
         <input id="email" placeholder="Email"><br><br>
 
-        <!-- OTHER -->
         <input id="occupation" placeholder="Occupation"><br><br>
         <input id="socialClass" placeholder="Social Class"><br><br>
         <input id="religion" placeholder="Religion"><br><br>
 
         <h3>FAMILY MEMBERS</h3>
+        <div id="familyContainer"></div>
 
-<div id="familyContainer"></div>
-
-<button type="button" onclick="addFamilyMember()">+ Add Member</button>
-
+        <button onclick="addFamilyMember()">+ Add Member</button>
         <button onclick="saveChanges()">💾 Save</button>
 
     </div>
-
 </div>
 
 <script>
 const token = localStorage.getItem("token");
+
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
+const sitio = params.get("sitio"); // ✅ FIX
 
 let residentData;
-
-/* AUTO AGE */
-document.getElementById("birthdate").addEventListener("change", function () {
-    const birthdate = new Date(this.value);
-    const today = new Date();
-
-    let age = today.getFullYear() - birthdate.getFullYear();
-    const m = today.getMonth() - birthdate.getMonth();
-
-    if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
-        age--;
-    }
-
-    document.getElementById("age").value = age;
-});
 
 /* LOAD DATA */
 async function loadData(){
 
-    const res = await fetch("http://localhost:5000/residents/sitio/1", {
+    const res = await fetch(`http://localhost:5000/residents/${id}`, {
         headers: { "Authorization": `Bearer ${token}` }
     });
 
-    const data = await res.json();
-    residentData = data.find(r => r._id === id);
+    residentData = await res.json();
+
+    if (!residentData) {
+        alert("Resident not found");
+        return;
+    }
 
     const head = residentData.head;
 
-    // HEAD FIELDS
     document.getElementById("name").value = head.name || "";
     document.getElementById("birthdate").value = head.birthdate || "";
     document.getElementById("age").value = head.age || "";
@@ -97,15 +77,10 @@ async function loadData(){
     document.getElementById("socialClass").value = head.socialClass || "";
     document.getElementById("religion").value = head.religion || "";
 
-    // FAMILY LOAD 🔥
     const container = document.getElementById("familyContainer");
     container.innerHTML = "";
 
-    if(residentData.familyMembers){
-        residentData.familyMembers.forEach(m => {
-            addFamilyMember(m);
-        });
-    }
+    (residentData.familyMembers || []).forEach(m => addFamilyMember(m));
 }
 
 /* SAVE */
@@ -140,68 +115,52 @@ async function saveChanges(){
         familyMembers: members
     };
 
-const res = await fetch(`http://localhost:5000/residents/${id}`, {
-    method: "PUT",
-    headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(updated)
-});
+    const res = await fetch(`http://localhost:5000/residents/${id}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(updated)
+    });
 
-if (!res.ok) {
-    const err = await res.text();
-    alert("Update failed: " + err);
-    return;
+    if (!res.ok) {
+        alert("Update failed");
+        return;
+    }
+
+    alert("Updated successfully!");
+
+    window.location.href = `profile.html?id=${id}&sitio=${sitio}`;
 }
 
-alert("Updated successfully!");
-window.location.href = `profile.html?id=${id}`;
-}
-
+/* ADD FAMILY */
 function addFamilyMember(data = null){
 
     const div = document.createElement("div");
     div.classList.add("family-member");
 
     div.innerHTML = `
-        <div class="row">
-            <input class="memberName" placeholder="Full Name" value="${data?.name || ""}">
-            <input type="date" class="memberBirthdate" value="${data?.birthdate || ""}">
-            <input type="number" class="memberAge" placeholder="Age" value="${data?.age || ""}" readonly>
-        </div>
-
-        <div class="row">
-            <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
-            <input class="memberOccupation" placeholder="Occupation" value="${data?.occupation || ""}">
-        </div>
-
-        <button type="button" class="removeBtn">❌ Remove</button>
+        <input class="memberName" placeholder="Name" value="${data?.name || ""}">
+        <input type="date" class="memberBirthdate" value="${data?.birthdate || ""}">
+        <input type="number" class="memberAge" readonly value="${data?.age || ""}">
+        <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
+        <input class="memberOccupation" placeholder="Occupation" value="${data?.occupation || ""}">
+        <button type="button" onclick="this.parentElement.remove()">❌</button>
         <hr>
     `;
 
     document.getElementById("familyContainer").appendChild(div);
-
-    // AUTO AGE
-    div.querySelector(".memberBirthdate").addEventListener("change", function () {
-        const birthdate = new Date(this.value);
-        const today = new Date();
-
-        let age = today.getFullYear() - birthdate.getFullYear();
-        const m = today.getMonth() - birthdate.getMonth();
-
-        if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
-            age--;
-        }
-
-        div.querySelector(".memberAge").value = age;
-    });
-
-    // REMOVE
-    div.querySelector(".removeBtn").addEventListener("click", function () {
-        div.remove();
-    });
 }
+
+/* AGE AUTO */
+document.getElementById("birthdate").addEventListener("change", function(){
+    const b = new Date(this.value);
+    const now = new Date();
+    let age = now.getFullYear() - b.getFullYear();
+    document.getElementById("age").value = age;
+});
+
 loadData();
 </script>
 

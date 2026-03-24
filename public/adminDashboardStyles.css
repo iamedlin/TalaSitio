@@ -1,0 +1,170 @@
+* { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+body { margin: 0; background: #f4f6f9; transition: background .3s, color .3s; }
+body.dark { background: #121212; color: #e4e4e4; }
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed; left: 0; top: 0; bottom: 0;
+  width: 230px; background: #1f2a44; color: #fff; padding: 20px;
+}
+body.dark .sidebar { background: #0d1528; }
+
+.sidebar a {
+  display: block; color: #cfd8ff; padding: 10px;
+  border-radius: 8px; margin: 6px 0;
+  cursor: pointer; text-decoration: none;
+}
+.sidebar a:hover { background: #2f3b63; }
+
+/* MAIN */
+.main { margin-left: 230px; padding: 20px; }
+
+.topbar {
+  background: #fff; padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  display: flex; justify-content: space-between;
+  align-items: center;
+}
+body.dark .topbar { background: #1e1e1e; }
+
+/* DASHBOARD CARDS */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 25px;
+  margin-top: 40px;
+  justify-items: center;
+}
+.card {
+  background: #fff; padding: 40px 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 300px;
+}
+body.dark .card { background: #1e1e1e; }
+.card h3 { font-size: 22px; margin-bottom: 15px; }
+.card p { font-size: 36px; font-weight: bold; margin: 0; }
+
+/* SITIO BUTTONS */
+.sitio-container {
+  margin-top: 25px; margin-bottom: 20px;
+  display: flex; gap: 10px; flex-wrap: wrap;
+  justify-content: center;
+}
+.sitio-btn {
+  padding: 16px 24px;
+  font-size: 18px;
+  border-radius: 8px; border: none;
+  cursor: pointer; background: #1f2a44; color: #fff;
+  transition: background 0.2s;
+}
+.sitio-btn:hover { background: #2f3b63; }
+
+/* TABLE */
+table {
+  width: 100%; border-collapse: collapse;
+  margin-top: 20px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+body.dark table { background: #1e1e1e; }
+
+th, td { padding: 12px 14px; text-align: left; }
+
+th { background: #1f2a44; color: #fff; }
+
+tr:nth-child(even) { background: #f2f4f8; }
+body.dark tr:nth-child(even) { background: #2a2a2a; }
+
+.status { padding: 4px 10px; border-radius: 999px; font-size: 12px; }
+.pending { background: #fff3cd; color: #856404; }
+.approved { background: #d4edda; color: #155724; }
+
+/* SECTIONS */
+.section { display: none; }
+.active { display: block; }
+
+/* SETTINGS */
+.settings-box {
+  max-width: 500px; background: #fff; padding: 20px;
+  border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+body.dark .settings-box { background: #1e1e1e; }
+
+.settings-box label { display: block; margin-top: 12px; font-weight: bold; }
+
+.settings-box input {
+  width: 100%; padding: 10px; margin-top: 6px;
+  border-radius: 8px; border: 1px solid #ccc;
+}
+
+.settings-box button {
+  margin-top: 16px; padding: 10px 16px;
+  border: none; border-radius: 8px;
+  background: #1f2a44; color: #fff; cursor: pointer;
+}
+
+.dark-toggle {
+  margin-top: 12px; padding: 10px;
+  border-radius: 8px; border: none;
+  background: #444; color: #fff; cursor: pointer;
+}
+
+/* MODAL */
+.modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  align-items: center; justify-content: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: #fff; padding: 25px;
+  border-radius: 14px; text-align: center;
+  width: 300px;
+}
+
+.modal-buttons {
+  margin-top: 20px; display: flex;
+  gap: 10px; justify-content: center;
+}
+
+.btn {
+  border: none; padding: 10px 16px;
+  border-radius: 8px; cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-ok { background: #1f2a44; color: #fff; }
+.btn-logout { background: #dc3545; color: #fff; }
+.btn-cancel { background: #6c757d; color: #fff; }
+
+/* REQUEST BOX */
+.request-box {
+  display: none;
+  position: absolute;
+  top: 50px; right: 20px;
+  width: 300px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.request-box h3 { margin-top: 0; }
+
+.notification-btn {
+  padding: 10px 14px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: #1f2a44;
+  color: #fff;
+  font-size: 16px;
+}

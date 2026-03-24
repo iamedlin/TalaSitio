@@ -14,120 +14,80 @@
 
         <!-- NAME -->
         <div class="row">
-            <div class="input-group">
-                <label>First Name *</label>
-                <input type="text" id="firstName" required>
-            </div>
-
-            <div class="input-group">
-                <label>Middle Name *</label>
-                <input type="text" id="middleName" required>
-            </div>
-
-            <div class="input-group">
-                <label>Last Name *</label>
-                <input type="text" id="lastName" required>
-            </div>
+            <input type="text" id="firstName" placeholder="First Name" required>
+            <input type="text" id="middleName" placeholder="Middle Name" required>
+            <input type="text" id="lastName" placeholder="Last Name" required>
         </div>
 
-        <!-- GENDER + STATUS -->
+        <!-- INFO -->
         <div class="row">
-            <div class="input-group">
-                <label>Gender *</label>
-                <select id="gender" required>
-                    <option value="">Select</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                </select>
-            </div>
+            <select id="gender" required>
+                <option value="">Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+            </select>
 
-            <div class="input-group">
-                <label>Civil Status *</label>
-                <select id="civilStatus" required>
-                    <option value="">Select</option>
-                    <option>Single</option>
-                    <option>Live-in</option>
-                    <option>Married</option>
-                    <option>Widowed</option>
-                    <option>Separated</option>
-                </select>
-            </div>
+            <select id="civilStatus" required>
+                <option value="">Civil Status</option>
+                <option>Single</option>
+                <option>Married</option>
+            </select>
 
-            <div class="input-group">
-                <label>Nationality *</label>
-                <input type="text" id="nationality" required>
-            </div>
+            <input type="text" id="nationality" placeholder="Nationality" required>
         </div>
 
-        <!-- BIRTHDATE + AGE -->
+        <!-- BIRTH -->
         <div class="row">
-            <div class="input-group">
-                <label>Birthdate *</label>
-                <input type="date" id="birthdate" required>
-            </div>
-
-            <div class="input-group">
-                <label>Age</label>
-                <input type="number" id="age" readonly>
-            </div>
-
-            <div class="input-group">
-                <label>Contact Number *</label>
-                <input type="text" id="contact" required>
-            </div>
-                <div class="input-group">
-        <label>Email *</label>
-        <input type="email" id="email" required>
-    </div>
+            <input type="date" id="birthdate" required>
+            <input type="number" id="age" readonly>
+            <input type="text" id="contact" placeholder="Contact" required>
+            <input type="email" id="email" placeholder="Email" required>
         </div>
 
-        <!-- OTHER INFO -->
+        <!-- OTHER -->
         <div class="row">
-            <div class="input-group">
-                <label>Occupation *</label>
-                <select id="occupation" required>
-                    <option value="">Select</option>
-                    <option>Employed</option>
-                    <option>Student</option>
-                    <option>Out of School</option>
-                    <option>Unemployed</option>
-                    <option>Self-employed</option>
-                    <option>Retired</option>
-                </select>
-            </div>
+            <select id="occupation" required>
+                <option value="">Occupation</option>
+                <option>Employed</option>
+                <option>Student</option>
+                <option>Unemployed</option>
+            </select>
 
-            <div class="input-group">
-                <label>Social Class *</label>
-                <input type="text" id="socialClass" required>
-            </div>
-
-            <div class="input-group">
-                <label>Religion *</label>
-                <input type="text" id="religion" required>
-            </div>
+            <input type="text" id="socialClass" placeholder="Social Class" required>
+            <input type="text" id="religion" placeholder="Religion" required>
         </div>
 
         <h2 class="section-title">FAMILY MEMBERS</h2>
 
         <div id="familyContainer"></div>
 
-        <button type="button" class="add-btn" onclick="addFamilyMember()">+ Add Member</button>
+        <button type="button" onclick="addFamilyMember()">+ Add Member</button>
 
-        <button type="submit" class="save-btn">SAVE INFORMATION</button>
+        <button type="submit">SAVE</button>
 
     </form>
 </div>
 
 <script>
+
 const token = localStorage.getItem("token");
 
-/* AUTO COMPUTE AGE */
+/* ✅ FIX: GET SITIO FROM STORAGE */
+let sitioId = Number(localStorage.getItem("sitioId"));
+
+if (!sitioId) {
+    alert("No sitio selected!");
+    window.location.href = "sitio.html";
+}
+
+/* AUTO AGE */
 document.getElementById("birthdate").addEventListener("change", function () {
+
     const birthdate = new Date(this.value);
     const today = new Date();
 
     let age = today.getFullYear() - birthdate.getFullYear();
+
     const m = today.getMonth() - birthdate.getMonth();
 
     if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
@@ -137,97 +97,29 @@ document.getElementById("birthdate").addEventListener("change", function () {
     document.getElementById("age").value = age;
 });
 
-/* ADD FAMILY MEMBER */
+/* ADD FAMILY */
 function addFamilyMember(){
+
     const div = document.createElement("div");
-    div.classList.add("family-member");
 
     div.innerHTML = `
-        <h3>Family Member</h3>
-
-        <div class="row">
-            <div class="input-group">
-                <label>First Name *</label>
-                <input type="text" class="memberFirst" required>
-            </div>
-
-            <div class="input-group">
-                <label>Middle Name *</label>
-                <input type="text" class="memberMiddle" required>
-            </div>
-
-            <div class="input-group">
-                <label>Last Name *</label>
-                <input type="text" class="memberLast" required>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="input-group">
-                <label>Birthdate *</label>
-                <input type="date" class="memberBirthdate" required>
-            </div>
-
-            <div class="input-group">
-                <label>Age</label>
-                <input type="number" class="memberAge" readonly>
-            </div>
-
-            <div class="input-group">
-                <label>Gender *</label>
-                <select class="memberGender" required>
-                    <option value="">Select</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="input-group">
-                <label>Relation *</label>
-                <input type="text" class="memberRelation" placeholder="Son, Wife..." required>
-            </div>
-
-            <div class="input-group">
-                <label>Civil Status *</label>
-                <select class="memberCivilStatus" required>
-                    <option value="">Select</option>
-                    <option>Single</option>
-                    <option>Live-in</option>
-                    <option>Married</option>
-                    <option>Widowed</option>
-                    <option>Separated</option>
-                </select>
-            </div>
-
-          <div class="input-group">
-                <label>Occupation *</label>
-                <select class="memberoccupation" required>
-                    <option value="">Select</option>
-                    <option>Employed</option>
-                    <option>Student</option>
-                    <option>Out of School</option>
-                    <option>Unemployed</option>
-                    <option>Self-employed</option>
-                    <option>Retired</option>
-                </select>
-            </div>
-        </div>
-
-        <button type="button" class="removeBtn">❌ Remove</button>
+        <input type="text" class="memberName" placeholder="Name" required>
+        <input type="date" class="memberBirthdate" required>
+        <input type="number" class="memberAge" readonly>
+        <input type="text" class="memberRelation" placeholder="Relation" required>
+        <button type="button" onclick="this.parentElement.remove()">Remove</button>
         <hr>
     `;
 
     document.getElementById("familyContainer").appendChild(div);
 
-    /* AUTO AGE FOR EACH MEMBER */
     div.querySelector(".memberBirthdate").addEventListener("change", function () {
+
         const birthdate = new Date(this.value);
         const today = new Date();
 
         let age = today.getFullYear() - birthdate.getFullYear();
+
         const m = today.getMonth() - birthdate.getMonth();
 
         if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
@@ -235,11 +127,6 @@ function addFamilyMember(){
         }
 
         div.querySelector(".memberAge").value = age;
-    });
-
-    /* REMOVE BUTTON */
-    div.querySelector(".removeBtn").addEventListener("click", function () {
-        div.remove();
     });
 }
 
@@ -249,53 +136,52 @@ document.getElementById("residentForm").addEventListener("submit", async functio
 
     const members = [];
 
-    document.querySelectorAll(".family-member").forEach(m => {
-    members.push({
-        name: `${m.querySelector(".memberFirst").value} ${m.querySelector(".memberMiddle").value} ${m.querySelector(".memberLast").value}`,
-        birthdate: m.querySelector(".memberBirthdate").value,
-        age: m.querySelector(".memberAge").value,
-        relation: m.querySelector(".memberRelation").value,
-        occupation: m.querySelector(".memberoccupation").value // ✅ match the HTML
-    });
-});
+    document.querySelectorAll(".memberName").forEach((el, i) => {
 
-    const fullName = `${document.getElementById("firstName").value} ${document.getElementById("middleName").value} ${document.getElementById("lastName").value}`;
+        members.push({
+            name: el.value,
+            birthdate: document.querySelectorAll(".memberBirthdate")[i].value,
+            age: Number(document.querySelectorAll(".memberAge")[i].value),
+            relation: document.querySelectorAll(".memberRelation")[i].value
+        });
+
+    });
 
     const data = {
         head: {
-            name: fullName,
-            birthdate: document.getElementById("birthdate").value,
-            age: document.getElementById("age").value,
-            gender: document.getElementById("gender").value,
-            civilStatus: document.getElementById("civilStatus").value,
-            contact: document.getElementById("contact").value,
-            email: document.getElementById("email").value,
-            occupation: document.getElementById("occupation").value,
-            socialClass: document.getElementById("socialClass").value,
-            religion: document.getElementById("religion").value,
-            nationality: document.getElementById("nationality").value
+            name: `${firstName.value} ${middleName.value} ${lastName.value}`,
+            birthdate: birthdate.value,
+            age: Number(age.value),
+            gender: gender.value,
+            civilStatus: civilStatus.value,
+            contact: contact.value,
+            email: email.value,
+            occupation: occupation.value,
+            socialClass: socialClass.value,
+            religion: religion.value,
+            nationality: nationality.value
         },
         familyMembers: members,
-        sitio: "1"
+        sitio: sitioId // ✅ FIXED
     };
 
-    try {
-        await fetch("http://localhost:5000/residents", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(data)
-        });
+    console.log("SENDING:", data);
 
-        alert("Saved successfully!");
-        window.location.href = "sitio1.html";
+    await fetch("http://localhost:5000/residents", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(data)
+    });
 
-    } catch(err){
-        console.error(err);
-    }
+    alert("Saved!");
+
+    /* BACK TO CORRECT SITIO */
+    window.location.href = `sitio.html?sitio=${sitioId}`;
 });
+
 </script>
 
 </body>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sitio 1</title>
+    <title>Sitio</title>
     <link rel="stylesheet" href="style2.css">
 
     <!-- Chart.js -->
@@ -12,26 +12,28 @@
 
 <div class="sidebar">
     <h2>TalaSitio</h2>
+
+    <div class="sitio-buttons">
+        <button onclick="goSitio(1)">Sitio 1</button>
+        <button onclick="goSitio(2)">Sitio 2</button>
+        <button onclick="goSitio(3)">Sitio 3</button>
+        <button onclick="goSitio(4)">Sitio 4</button>
+        <button onclick="goSitio(5)">Sitio 5</button>
+    </div>
 </div>
 
 <div class="main">
 
-   <div class="top-bar">
-    <h1>🏡 Sitio 1 Dashboard</h1>
+    <div class="top-bar">
+        <h1 id="sitioTitle">Sitio</h1>
 
-    <div style="display:flex; gap:10px;">
-        <button class="add-btn"
-            onclick="window.location.href='addResident.html'">
-            + Add Resident
-        </button>
-
-        <button class="exit-btn" onclick="goBack()">
-            ⬅ Exit
-        </button>
+        <div style="display:flex; gap:10px;">
+            <button onclick="goAddResident()">+ Add Resident</button>
+            <button onclick="goBack()">⬅ Exit</button>
+        </div>
     </div>
-</div>
 
-    <!-- 🔵 STATS -->
+    <!-- STATS -->
     <div class="stats-grid">
         <div class="stat-card">
             <h4>Population</h4>
@@ -58,7 +60,7 @@
 
         <div class="card">
             <h2>Residents</h2>
-            <div id="residentList" class="resident-grid"></div>
+            <div id="residentList"></div>
         </div>
 
         <div class="card">
@@ -71,17 +73,54 @@
 </div>
 
 <script>
-const token = localStorage.getItem("token");
-let chart;
 
-/* VIEW PROFILE */
+const token = localStorage.getItem("token");
+
+/* ✅ FIX: declare chart */
+let chart = null;
+
+/* ======================
+   GET / SAVE SITIO
+====================== */
+const params = new URLSearchParams(window.location.search);
+const sitioFromUrl = params.get("sitio");
+
+if (sitioFromUrl) {
+    localStorage.setItem("sitioId", sitioFromUrl);
+}
+
+let sitioId = Number(localStorage.getItem("sitioId"));
+
+if (!sitioId) {
+    sitioId = 1;
+    localStorage.setItem("sitioId", sitioId);
+}
+
+document.getElementById("sitioTitle").innerText = "Sitio " + sitioId;
+
+/* ======================
+   NAVIGATION
+====================== */
+function goSitio(id){
+    localStorage.setItem("sitioId", id);
+    window.location.href = `sitio.html?sitio=${id}`;
+}
+
+function goBack(){
+    window.location.href = "adminDashboard.html";
+}
+
+function goAddResident(){
+    window.location.href = "addResident.html";
+}
+
 function viewProfile(id){
     window.location.href = `profile.html?id=${id}`;
 }
-function goBack() {
-    window.location.href = "adminDashboard.html";
-}
-/* CHART */
+
+/* ======================
+   CHART
+====================== */
 function renderChart(residents){
 
     const ageGroups = {
@@ -102,18 +141,17 @@ function renderChart(residents){
             else ageGroups["60+"]++;
         }
 
-        if (r.familyMembers) {
-            r.familyMembers.forEach(m => {
-                if(m.age == null) return;
+        r.familyMembers?.forEach(m => {
 
-                const age = m.age;
+            if(m.age == null) return;
 
-                if(age <= 17) ageGroups["0-17"]++;
-                else if(age <= 35) ageGroups["18-35"]++;
-                else if(age <= 60) ageGroups["36-60"]++;
-                else ageGroups["60+"]++;
-            });
-        }
+            const age = m.age;
+
+            if(age <= 17) ageGroups["0-17"]++;
+            else if(age <= 35) ageGroups["18-35"]++;
+            else if(age <= 60) ageGroups["36-60"]++;
+            else ageGroups["60+"]++;
+        });
 
     });
 
@@ -132,7 +170,9 @@ function renderChart(residents){
     });
 }
 
-/* LOAD DATA */
+/* ======================
+   LOAD RESIDENTS
+====================== */
 async function loadResidents(){
 
     const container = document.getElementById("residentList");
@@ -140,8 +180,10 @@ async function loadResidents(){
 
     try {
 
-        const res = await fetch("http://localhost:5000/residents/sitio/1", {
-            headers: { "Authorization": `Bearer ${token}` }
+        const res = await fetch(`http://localhost:5000/residents/sitio/${sitioId}`, {
+            headers: { 
+                "Authorization": `Bearer ${token}` 
+            }
         });
 
         const residents = await res.json();
@@ -153,44 +195,41 @@ async function loadResidents(){
 
         residents.forEach(r => {
 
-            // HEAD
             if (r.head) {
                 totalPopulation++;
 
                 const age = r.head.age;
+
                 if (age >= 60) seniorCount++;
 
-               if (!r.head.work || r.head.work.trim() === "") {
-                     unemployedCount++;
+                if (!r.head.occupation || r.head.occupation.trim() === "") {
+                    unemployedCount++;
 
-                     if (age >= 6 && age <= 24) { // typical school age
-                      outOfSchool++;
-                       }
+                    if (age >= 6 && age <= 24) {
+                        outOfSchool++;
                     }
+                }
             }
 
-            // FAMILY
-            if (r.familyMembers) {
-                r.familyMembers.forEach(m => {
-                    totalPopulation++;
+            r.familyMembers?.forEach(m => {
 
-                    const age = m.age;
+                totalPopulation++;
 
-                    if (age >= 60) seniorCount++;
+                const age = m.age;
 
-if (!m.occupation || m.occupation.trim() === "") {
-    unemployedCount++;
+                if (age >= 60) seniorCount++;
 
-    if (age >= 6 && age <= 24) {
-        outOfSchool++;
-    }
-}
-                });
-            }
+                if (!m.occupation || m.occupation.trim() === "") {
+                    unemployedCount++;
+
+                    if (age >= 6 && age <= 24) {
+                        outOfSchool++;
+                    }
+                }
+            });
 
         });
 
-        // DISPLAY
         document.getElementById("totalPopulation").innerText = totalPopulation;
         document.getElementById("seniorCount").innerText = seniorCount;
         document.getElementById("unemployedCount").innerText = unemployedCount;
@@ -200,9 +239,14 @@ if (!m.occupation || m.occupation.trim() === "") {
 
         container.innerHTML = "";
 
+        if (!residents.length) {
+            container.innerHTML = "<p>No residents found</p>";
+            return;
+        }
+
         residents.forEach(res => {
+
             const div = document.createElement("div");
-            div.classList.add("resident-card");
 
             div.innerHTML = `
                 <h3>${res.head?.name || "No Name"}</h3>
@@ -211,8 +255,6 @@ if (!m.occupation || m.occupation.trim() === "") {
 
                 <button onclick="viewProfile('${res._id}')">View Family</button>
                 <button onclick="deleteResident('${res._id}')">Remove</button>
-
-                <div id="family-${res._id}" style="display:none;"></div>
             `;
 
             container.appendChild(div);
@@ -220,47 +262,30 @@ if (!m.occupation || m.occupation.trim() === "") {
 
     } catch(err){
         console.error(err);
+        container.innerHTML = "<p>Error loading data</p>";
     }
 }
 
-loadResidents();
-
-/* TOGGLE FAMILY */
-function toggleFamily(id){
-    const container = document.getElementById(`family-${id}`);
-
-    if(container.style.display === "none"){
-        container.style.display = "block";
-
-        fetch("http://localhost:5000/residents/sitio/1", {
-            headers: { "Authorization": `Bearer ${token}` }
-        })
-        .then(res => res.json())
-        .then(data => {
-            const resident = data.find(r => r._id === id);
-
-            container.innerHTML = resident.familyMembers.map(m => `
-                <p>👤 ${m.name} (${m.relation}) - Age: ${m.age}</p>
-            `).join("");
-        });
-
-    } else {
-        container.style.display = "none";
-    }
-}
-
-/* DELETE */
+/* ======================
+   DELETE
+====================== */
 async function deleteResident(id){
 
     if(!confirm("Delete this resident?")) return;
 
     await fetch(`http://localhost:5000/residents/${id}`, {
         method: "DELETE",
-        headers: { "Authorization": `Bearer ${token}` }
+        headers: { 
+            "Authorization": `Bearer ${token}` 
+        }
     });
 
     loadResidents();
 }
+
+/* INIT */
+loadResidents();
+
 </script>
 
 </body>
