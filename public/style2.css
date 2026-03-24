@@ -45,11 +45,13 @@ body {
 }
 
 /* STATS */
+/* Move stats grid slightly away from sidebar */
 .stats-grid {
+    margin-left: 20px; /* increase this to push further */
+    margin-top: 20px;  /* optional, to move down a bit */
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 15px;
-    margin: 20px 0;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
 }
 
 .stat-card {
