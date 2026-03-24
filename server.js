@@ -13,81 +13,71 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
-
-const dashboardRoutes = require("./routes/dashboardRoutes");
-app.use("/api/dashboard", dashboardRoutes);
-
 const Resident = require("./models/Resident");
-const { protect } = require("./middleware/authMiddleware");
+const User = require("./models/User");
+const bcrypt = require("bcryptjs");
 
+/* =========================
+   GET ALL BY SITIO (FIXED)
+========================= */
 app.get("/residents/sitio/:number", async (req, res) => {
-    const sitio = req.params.number;
-
     try {
+        const sitioNumber = Number(req.params.number);
+
         const residents = await Resident.find({
-    sitio: String(req.params.number) // ✅ siguradong match
-});
+            sitio: sitioNumber
+        });
+
+        console.log("FETCH SITIO:", sitioNumber);
+        console.log("RESULT:", residents.length);
+
         res.json(residents);
     } catch (err) {
         res.status(500).json({ message: "Error fetching residents" });
     }
 });
 
-const bcrypt = require("bcryptjs");
-const User = require("./models/User");
-
-app.post("/residents", async (req, res) => {
+/* =========================
+   GET BY ID (IMPORTANT)
+========================= */
+app.get("/residents/:id", async (req, res) => {
     try {
-        console.log("POST HIT");
-        console.log("BODY:", req.body);
+        const resident = await Resident.findById(req.params.id);
 
-        const { head, familyMembers, sitio } = req.body;
-
-        if (!head.email) {
-            return res.status(400).json({ message: "Email is required" });
+        if (!resident) {
+            return res.status(404).json({ message: "Not found" });
         }
 
-        // 1. SAVE RESIDENT
+        res.json(resident);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+/* =========================
+   CREATE RESIDENT (FIXED)
+========================= */
+app.post("/residents", async (req, res) => {
+    try {
+        const { head, familyMembers, sitio } = req.body;
+
         const newResident = new Resident({
             head,
             familyMembers: familyMembers || [],
-            sitio: String(sitio) // ✅ FIXED
+            sitio: Number(sitio) // 🔥 FIXED (number)
         });
 
         await newResident.save();
 
-        // 2. CREATE USER ACCOUNT
         const email = head.email;
-        const rawPassword = head.birthdate.replace(/-/g, ""); // ✅ improved
+        const rawPassword = head.birthdate.replace(/-/g, "");
         const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-        // ✅ DEBUG HERE
-console.log("HEAD:", head);
-console.log("NAME:", head.name);
-
-const name = head.name;
-
-if (!name) {
-    console.log("❌ NAME IS UNDEFINED!");
-    return res.status(400).json({ message: "Name is missing" });
-}
-
-try {
-    await User.create({
-        name,       // ✅ Use the variable we already defined
-        email,
-        password: hashedPassword
-    });
-    console.log("USER CREATED");
-} catch (err) {
-    if (err.code === 11000) {
-        console.log("User already exists");
-    } else {
-        throw err;
-    }
-}
+        await User.create({
+            name: head.name,
+            email,
+            password: hashedPassword
+        });
 
         res.json({ message: "Saved successfully" });
 
@@ -96,60 +86,52 @@ try {
         res.status(500).json({ message: "Error saving resident" });
     }
 });
-app.delete("/residents/:id", async (req, res) => {
-    try {
-        const id = req.params.id;
 
-        // 1️⃣ Find the resident first
-        const resident = await Resident.findById(id);
-
-        if (!resident) {
-            return res.status(404).json({ message: "Resident not found" });
-        }
-
-        // 2️⃣ Delete the resident
-        await Resident.findByIdAndDelete(id);
-        console.log("RESIDENT DELETED:", resident);
-
-        // 3️⃣ Delete the user account linked to email
-        const email = resident.head.email;
-
-        if (email) {
-            const deletedUser = await User.findOneAndDelete({ email });
-            if (deletedUser) {
-                console.log("USER DELETED:", deletedUser.email);
-            } else {
-                console.log("No user found for this email");
-            }
-        }
-
-        res.json({ message: "Resident and linked user deleted successfully" });
-
-    } catch (err) {
-        console.error("DELETE ERROR:", err);
-        res.status(500).json({ error: err.message });
-    }
-});
+/* =========================
+   UPDATE RESIDENT
+========================= */
 app.put("/residents/:id", async (req, res) => {
     try {
-        const { id } = req.params;
-
-        const updatedResident = await Resident.findByIdAndUpdate(
-            id,
+        const updated = await Resident.findByIdAndUpdate(
+            req.params.id,
             req.body,
-            { new: true } // returns updated data
+            { new: true }
         );
 
-        res.json(updatedResident);
+        res.json(updated);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 });
 
+/* =========================
+   DELETE RESIDENT
+========================= */
+app.delete("/residents/:id", async (req, res) => {
+    try {
+        const resident = await Resident.findById(req.params.id);
 
+        if (!resident) {
+            return res.status(404).json({ message: "Not found" });
+        }
+
+        await Resident.findByIdAndDelete(req.params.id);
+
+        const email = resident.head.email;
+
+        if (email) {
+            await User.findOneAndDelete({ email });
+        }
+
+        res.json({ message: "Deleted" });
+
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });

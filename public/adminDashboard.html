@@ -46,7 +46,7 @@
       <button class="sitio-btn" onclick="goToSitio(3)">Poblacion</button>
       <button class="sitio-btn" onclick="goToSitio(4)">Roga</button>
       <button class="sitio-btn" onclick="goToSitio(5)">Paner</button>
-      <button class="sitio-btn" onclick="goToSitio(5)">Pinagpala</button>
+      <button class="sitio-btn" onclick="goToSitio(6)">Pinagpala</button>
     </div>
   </div>
 
@@ -128,7 +128,9 @@ function logout(){
 }
 
 // Sitio navigation
-function goToSitio(number){ window.location.href = `sitio${number}.html`; }
+function goToSitio(number){ 
+  window.location.href = `sitio.html?sitio=${number}`; 
+}
 
 // Requests Box
 function toggleRequestsBox(){
