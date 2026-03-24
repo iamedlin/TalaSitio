@@ -13,157 +13,23 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// MODELS
 const Resident = require("./models/Resident");
 const User = require("./models/User");
-const EditRequest = require("./models/EditRequest");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-
-app.post("/api/auth/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-
-        const user = await User.findOne({ email });
-
-        if (!user) {
-            return res.status(400).json({ message: "User not found" });
-        }
-
-        const isMatch = await bcrypt.compare(password, user.password);
-
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-
-        const token = jwt.sign(
-            { id: user._id, role: user.role || "user" },
-            process.env.JWT_SECRET,
-            { expiresIn: "1d" }
-        );
-
-        res.json({
-            token,
-            role: user.role || "user"
-        });
-
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-// MIDDLEWARE
-const { protect } = require("./middleware/authMiddleware");
 
 /* =========================
-   EDIT REQUEST (USER)
-========================= */
-app.post("/api/edit-request", protect, async (req, res) => {
-    try {
-        const request = new EditRequest({
-            userId: req.user.id,
-            newData: req.body
-        });
-
-        await request.save();
-
-        res.json({ message: "Request sent to admin for approval." });
-
-    } catch (err) {
-        res.status(500).json({ message: "Error sending request" });
-    }
-});
-
-/* =========================
-   GET ALL EDIT REQUESTS (ADMIN)
-========================= */
-app.get("/api/edit-requests", async (req, res) => {
-    const requests = await EditRequest.find().populate("userId");
-    res.json(requests);
-});
-
-/* =========================
-   APPROVE REQUEST
-========================= */
-app.put("/api/edit-request/:id/approve", async (req, res) => {
-    try {
-        const request = await EditRequest.findById(req.params.id);
-        if (!request) return res.status(404).json({ message: "Not found" });
-
-        const user = await User.findById(request.userId);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        // APPLY CHANGES
-        user.name = request.newData.name;
-        user.email = request.newData.email;
-
-        // NOTIFICATION
-        user.notifications.push({
-            message: "Your profile update has been approved"
-        });
-
-        await user.save();
-
-        request.status = "approved";
-        await request.save();
-
-        res.json({ message: "Request approved and user updated" });
-
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-/* =========================
-   REJECT REQUEST
-========================= */
-app.put("/api/edit-request/:id/reject", async (req, res) => {
-    try {
-        const request = await EditRequest.findById(req.params.id);
-        if (!request) return res.status(404).json({ message: "Not found" });
-
-        const user = await User.findById(request.userId);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        // NOTIFICATION
-        user.notifications.push({
-            message: "Your profile update was rejected"
-        });
-
-        await user.save();
-
-        request.status = "rejected";
-        await request.save();
-
-        res.json({ message: "Request rejected" });
-
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-/* =========================
-   GET NOTIFICATIONS
-========================= */
-app.get("/api/notifications", protect, async (req, res) => {
-    try {
-        const user = await User.findById(req.user.id);
-
-        res.json(user.notifications || []);
-
-    } catch (err) {
-        res.status(500).json({ message: "Error fetching notifications" });
-    }
-});
-
-/* =========================
-   GET RESIDENTS BY SITIO
+   GET ALL BY SITIO (FIXED)
 ========================= */
 app.get("/residents/sitio/:number", async (req, res) => {
     try {
         const sitioNumber = Number(req.params.number);
 
-        const residents = await Resident.find({ sitio: sitioNumber });
+        const residents = await Resident.find({
+            sitio: sitioNumber
+        });
+
+        console.log("FETCH SITIO:", sitioNumber);
+        console.log("RESULT:", residents.length);
 
         res.json(residents);
     } catch (err) {
@@ -172,7 +38,7 @@ app.get("/residents/sitio/:number", async (req, res) => {
 });
 
 /* =========================
-   GET RESIDENT BY ID
+   GET BY ID (IMPORTANT)
 ========================= */
 app.get("/residents/:id", async (req, res) => {
     try {
@@ -189,7 +55,7 @@ app.get("/residents/:id", async (req, res) => {
 });
 
 /* =========================
-   CREATE RESIDENT
+   CREATE RESIDENT (FIXED)
 ========================= */
 app.post("/residents", async (req, res) => {
     try {
@@ -198,7 +64,7 @@ app.post("/residents", async (req, res) => {
         const newResident = new Resident({
             head,
             familyMembers: familyMembers || [],
-            sitio: Number(sitio)
+            sitio: Number(sitio) // 🔥 FIXED (number)
         });
 
         await newResident.save();
@@ -216,6 +82,7 @@ app.post("/residents", async (req, res) => {
         res.json({ message: "Saved successfully" });
 
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Error saving resident" });
     }
 });
@@ -263,9 +130,6 @@ app.delete("/residents/:id", async (req, res) => {
     }
 });
 
-/* =========================
-   SERVER START
-========================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
