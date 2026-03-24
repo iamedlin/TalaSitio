@@ -66,6 +66,18 @@ cursor:pointer;
 <div class="card">
     <h3>Loading...</h3>
     <p>Please wait...</p>
+
+    <button onclick="openEditForm()">Edit Profile</button>
+</div>
+
+<!-- Hidden Edit Form -->
+<div id="editForm" style="display:none;" class="card">
+    <h3>Edit Profile</h3>
+
+    <input type="text" id="editName" placeholder="Name"><br><br>
+    <input type="email" id="editEmail" placeholder="Email"><br><br>
+
+    <button onclick="submitEdit()">Submit Request</button>
 </div>
 
 <script>
@@ -84,35 +96,69 @@ function logout() {
     }
 }
 
-// Fetch current user info
+function openEditForm() {
+    document.getElementById("editForm").style.display = "block";
+}
+
+async function submitEdit() {
+    const name = document.getElementById("editName").value;
+    const email = document.getElementById("editEmail").value;
+
+    const res = await fetch("http://localhost:5000/api/edit-request", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+            name,
+            email
+        })
+    });
+
+    const data = await res.json();
+    alert(data.message);
+}
+
+let currentUser = null;
+
 async function getCurrentUser() {
     try {
         const res = await fetch("http://localhost:5000/api/auth/me", {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
-        // If token expired or invalid
         if (!res.ok) {
             const data = await res.json();
-            alert(data.message || "Session expired. Please login again.");
+            alert(data.message || "Session expired.");
             localStorage.removeItem("token");
             window.location.href = "login.html";
             return;
         }
 
-        // Successful fetch
         const user = await res.json();
+        currentUser = user;
+
         document.querySelector(".card h3").textContent = `Welcome, ${user.name}`;
         document.querySelector(".card p").textContent = `You are logged in as ${user.email}`;
 
+        // Prefill edit form
+        document.getElementById("editName").value = user.name;
+        document.getElementById("editEmail").value = user.email;
+
     } catch (err) {
-        console.error("Error fetching user:", err);
-        alert("Server error. Please refresh or login again.");
+        console.error(err);
     }
 }
 
-// Run on page load
-getCurrentUser();
+async function getNotifications() {
+    const res = await fetch("http://localhost:5000/api/notifications", {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const data = await res.json();
+    console.log(data);
+}
 </script>
 </body>
 </html>

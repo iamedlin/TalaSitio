@@ -18,7 +18,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ["user", "admin"],
     default: "user"
-  }
+  },
+
+  // ✅ ADD THIS
+  notifications: [
+    {
+      message: String,
+      read: { type: Boolean, default: false }
+    }
+  ]
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);
