@@ -83,35 +83,73 @@ function logout() {
         window.location.href = "login.html";
     }
 }
+function requestEdit(residentId) {
+    const newName = prompt("Enter new name:");
+
+    if (!newName) return; // Cancel pressed
+
+    fetch("http://localhost:5000/edit-request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            residentId,
+            newData: {
+                $set: { "head.name": newName } // Use $set for nested update
+            }
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+    })
+    .catch(err => console.error(err));
+}
 
 // Fetch current user info
 async function getCurrentUser() {
     try {
+        // 1. Get logged in user
         const res = await fetch("http://localhost:5000/api/auth/me", {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
-        // If token expired or invalid
         if (!res.ok) {
             const data = await res.json();
-            alert(data.message || "Session expired. Please login again.");
+            alert(data.message || "Session expired.");
             localStorage.removeItem("token");
             window.location.href = "login.html";
             return;
         }
 
-        // Successful fetch
         const user = await res.json();
-        document.querySelector(".card h3").textContent = `Welcome, ${user.name}`;
-        document.querySelector(".card p").textContent = `You are logged in as ${user.email}`;
+
+        // 2. Fetch resident using email
+        const residentRes = await fetch(`http://localhost:5000/residents/by-email/${user.email}`);
+        const resident = await residentRes.json();
+
+        // 3. DISPLAY DATA
+        document.querySelector(".card").innerHTML = `
+            <h3>${resident.head.name}</h3>
+            <p>Email: ${resident.head.email}</p>
+            <p>Birthdate: ${resident.head.birthdate}</p>
+
+            <h4>Family Members:</h4>
+            ${resident.familyMembers.map(member => `
+                <div class="resident-card">
+                    <p><b>${member.name}</b></p>
+                    <p>${member.birthdate}</p>
+                </div>
+            `).join("")}
+
+            <br>
+            <button onclick="requestEdit('${resident._id}')">Edit Info</button>
+        `;
 
     } catch (err) {
-        console.error("Error fetching user:", err);
-        alert("Server error. Please refresh or login again.");
+        console.error(err);
+        alert("Error loading user data");
     }
 }
-
-// Run on page load
 getCurrentUser();
 </script>
 </body>
