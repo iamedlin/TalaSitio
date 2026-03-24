@@ -250,14 +250,14 @@ document.getElementById("residentForm").addEventListener("submit", async functio
     const members = [];
 
     document.querySelectorAll(".family-member").forEach(m => {
-        members.push({
-            name: `${m.querySelector(".memberFirst").value} ${m.querySelector(".memberMiddle").value} ${m.querySelector(".memberLast").value}`,
-            birthdate: m.querySelector(".memberBirthdate").value,
-            age: m.querySelector(".memberAge").value,
-            relation: m.querySelector(".memberRelation").value,
-            occupation: m.querySelector(".memberOccupation").value
-        });
+    members.push({
+        name: `${m.querySelector(".memberFirst").value} ${m.querySelector(".memberMiddle").value} ${m.querySelector(".memberLast").value}`,
+        birthdate: m.querySelector(".memberBirthdate").value,
+        age: m.querySelector(".memberAge").value,
+        relation: m.querySelector(".memberRelation").value,
+        occupation: m.querySelector(".memberoccupation").value // ✅ match the HTML
     });
+});
 
     const fullName = `${document.getElementById("firstName").value} ${document.getElementById("middleName").value} ${document.getElementById("lastName").value}`;
 

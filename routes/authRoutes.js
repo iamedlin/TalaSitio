@@ -1,7 +1,22 @@
 const express = require("express");
 const router = express.Router();
-
 const User = require("../models/User");
+const { protect } = require("../middleware/authMiddleware");
+
+// GET CURRENT LOGGED-IN USER
+router.get("/me", protect, async (req, res) => {
+  try {
+    // req.user is decoded from JWT
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json(user); // returns { name, email, role, _id }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error fetching user info" });
+  }
+});
+
 const AccountRequest = require("../models/AccountRequest");
 
 const bcrypt = require("bcryptjs");
@@ -85,6 +100,8 @@ router.post("/login", async (req, res) => {
   }
 
 });
+
+
 
 /* =========================
 REQUEST ACCOUNT (PUBLIC)
