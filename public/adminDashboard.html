@@ -6,13 +6,201 @@
 <title>TalaSitio Admin Dashboard</title>
 
 <link rel="stylesheet" href="adminDashboardStyles.css">
+
+<style>
+/* (In case CSS file is not loaded, fallback styles) */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+  display: flex;
+  background: #f4f6fb;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e3c72, #2a5298);
+  color: white;
+  padding: 20px;
+  position: fixed;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 10px 0;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* MAIN */
+.main {
+  margin-left: 250px;
+  padding: 20px;
+  width: 100%;
+}
+
+/* TOPBAR */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+/* BUTTONS */
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #2a5298;
+  color: white;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #1e3c72;
+}
+
+/* SITIO */
+.sitio-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.sitio-btn {
+  padding: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  background: white;
+  color: #2a5298;
+  border: 2px solid #2a5298;
+  border-radius: 12px;
+  transition: 0.3s;
+}
+
+.sitio-btn:hover {
+  background: #2a5298;
+  color: white;
+  transform: translateY(-5px);
+}
+
+/* SETTINGS */
+.settings-box {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.settings-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+/* SECTION */
+.section {
+  display: none;
+}
+
+.section.active {
+  display: block;
+}
+
+/* REQUEST BOX */
+.request-box {
+  position: absolute;
+  right: 20px;
+  top: 70px;
+  width: 300px;
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  display: none;
+}
+
+.request-box div {
+  background: #f4f6fb;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+/* DARK MODE */
+body.dark {
+  background: #1e1e2f;
+  color: white;
+}
+
+body.dark .topbar,
+body.dark .settings-box,
+body.dark .request-box,
+body.dark .modal-box {
+  background: #2a2a40;
+  color: white;
+}
+
+body.dark .sitio-btn {
+  background: #2a2a40;
+  color: white;
+  border: 2px solid #555;
+}
+</style>
+
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <div class="sidebar"> <h2 class="logo-title"> <img src="images/loading.png" alt="Logo"> TalaSitio </h2>
   <a onclick="showSection('dashboard')">📊 Dashboard</a>
-  <a href="settings.html">⚙️ Settings</a> 
+  <a onclick="showSection('settings')">⚙️ Settings</a>
   <a onclick="openLogoutModal()">🚪 Logout</a>
 </div>
 
@@ -20,26 +208,23 @@
 <!-- MAIN -->
 <div class="main">
 
+  <!-- TOPBAR -->
   <div class="topbar">
     <h2>Admin Panel</h2>
-    <div style="display: flex; align-items: center; gap: 20px;">
+    <div>
       👤 <span id="adminDisplay">Admin</span>
-      <button class="notification-btn" onclick="toggleRequestsBox()">🔔</button>
+      <button onclick="toggleRequestsBox()">🔔</button>
     </div>
   </div>
 
   <!-- REQUEST BOX -->
   <div id="requestBox" class="request-box">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-      <h3>Account Requests</h3>
-      <button style="background:none; border:none; font-size:18px; cursor:pointer;" onclick="closeRequestBox()">✖</button>
-    </div>
+    <h3>Account Requests</h3>
     <div id="requestList"></div>
   </div>
 
   <!-- DASHBOARD -->
   <div id="dashboard" class="section active">
-    <!-- Sitio Buttons -->
     <div class="sitio-container">
       <button class="sitio-btn" onclick="goToSitio(1)">Marlane</button>
       <button class="sitio-btn" onclick="goToSitio(2)">Visayan Village</button>
@@ -49,23 +234,24 @@
       <button class="sitio-btn" onclick="goToSitio(6)">Pinagpala</button>
     </div>
   </div>
+
   <!-- SETTINGS -->
   <div id="settings" class="section">
     <h2>Account & System Settings</h2>
     <div class="settings-box">
       <label>Full Name</label>
-      <input id="nameInput" type="text" placeholder="Enter new name" />
+      <input id="nameInput" type="text" placeholder="Enter new name">
 
       <label>Username</label>
-      <input id="usernameInput" type="text" placeholder="Enter new username" />
+      <input id="usernameInput" type="text" placeholder="Enter new username">
 
       <label>Email</label>
-      <input type="email" placeholder="Enter new email" />
+      <input type="email" placeholder="Enter new email">
 
-      <label>New Password</label>
-      <input type="password" placeholder="Enter new password" />
+      <label>Password</label>
+      <input type="password" placeholder="Enter new password">
 
-      <button class="dark-toggle" onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+     
       <button onclick="saveSettings()">Save Changes</button>
     </div>
   </div>
@@ -76,22 +262,17 @@
 <div id="logoutModal" class="modal">
   <div class="modal-box">
     <h3>Confirm Logout</h3>
-    <p>Are you sure you want to log out?</p>
-    <div class="modal-buttons">
-      <button class="btn btn-logout" onclick="logout()">Logout</button>
-      <button class="btn btn-cancel" onclick="closeLogoutModal()">Cancel</button>
-    </div>
+    <p>Are you sure?</p>
+    <button onclick="logout()">Logout</button>
+    <button onclick="closeLogoutModal()">Cancel</button>
   </div>
 </div>
 
 <!-- SAVE MODAL -->
 <div id="saveModal" class="modal">
   <div class="modal-box">
-    <h3>Settings Saved ✅</h3>
-    <p>Your changes were applied successfully.</p>
-    <div class="modal-buttons">
-      <button class="btn btn-ok" onclick="closeSaveModal()">OK</button>
-    </div>
+    <h3>Saved ✅</h3>
+    <button onclick="closeSaveModal()">OK</button>
   </div>
 </div>
 
@@ -100,112 +281,63 @@ const token = localStorage.getItem("token");
 if(!token) window.location.href="login.html";
 
 function showSection(id){
-  document.querySelectorAll('.section').forEach(sec=>sec.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-function closeRequestBox(){
-  document.getElementById("requestBox").style.display = "none";
+function toggleDarkMode(){
+  document.body.classList.toggle('dark');
 }
 
-function toggleDarkMode() { document.body.classList.toggle('dark'); }
-
-function toggleDarkMode() { document.body.classList.toggle('dark'); }
 function saveSettings(){
   const username = document.getElementById('usernameInput').value;
   if(username) document.getElementById('adminDisplay').textContent = username;
   document.getElementById('saveModal').style.display='flex';
 }
 
-function closeSaveModal(){ document.getElementById('saveModal').style.display='none'; }
+function closeSaveModal(){
+  document.getElementById('saveModal').style.display='none';
+}
 
-function openLogoutModal(){ document.getElementById('logoutModal').style.display='flex'; }
-function closeLogoutModal(){ document.getElementById('logoutModal').style.display='none'; }
+function openLogoutModal(){
+  document.getElementById('logoutModal').style.display='flex';
+}
+
+function closeLogoutModal(){
+  document.getElementById('logoutModal').style.display='none';
+}
 
 function logout(){
   localStorage.removeItem("token");
   window.location.href="login.html";
 }
 
-// Sitio navigation
-function goToSitio(number){ 
-  window.location.href = `sitio.html?sitio=${number}`; 
+function goToSitio(num){
+  window.location.href = `sitio.html?sitio=${num}`;
 }
 
-// Requests Box
 function toggleRequestsBox(){
   const box = document.getElementById("requestBox");
-  box.style.display = box.style.display==='block' ? 'none':'block';
-  if(box.style.display==='block') fetchRequests();
+  box.style.display = box.style.display === 'block' ? 'none' : 'block';
+  if(box.style.display === 'block') fetchRequests();
 }
 
-// Fetch requests from server
 async function fetchRequests(){
   const res = await fetch("http://localhost:5000/edit-requests");
   const data = await res.json();
 
-   const box = document.getElementById("requestBox");
+  const list = document.getElementById("requestList");
+  list.innerHTML = "";
 
-    box.innerHTML = data.map(req => `
-        <div class="card">
-            <p>Resident ID: ${req.residentId}</p>
-            <p>Status: ${req.status}</p>
-            <button onclick="approve('${req._id}')">Approve</button>
-        </div>
-    `).join("");
-}
-
-function approveEdit(id) {
-    fetch(`http://localhost:5000/edit-request/approve/${id}`, {
-        method: "PUT"
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        fetchRequests(); // refresh
-    });
-}
-
-async function approveRequest(id){
-  try {
-    await fetch(`http://localhost:5000/approve-request/${id}`, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    fetchRequests();
-  } catch (err) {
-    console.error("Error approving request:", err);
-  }
-}
-
-// Toggle request box and fetch requests
-function toggleRequestsBox(){
-    const box = document.getElementById("requestBox");
-    box.style.display = box.style.display==='block' ? 'none':'block';
-    if(box.style.display==='block') fetchRequests();
-}
-
-// Fetch edit requests
-async function fetchRequests(){
-    try {
-        const response = await fetch("http://localhost:5000/edit-requests");
-        const requests = await response.json();
-
-        const list = document.getElementById("requestList");
-        list.innerHTML = "";
-
-        requests.forEach(req => {
-            const div = document.createElement("div");
-            div.innerHTML = `
-                <p><b>Resident ID:</b> ${req.residentId}</p>
-                <p>Status: ${req.status}</p>
-                ${req.status === "pending" ? `<button onclick="approveEdit('${req._id}')">Approve</button>` : `<small>✔ ${req.status}</small>`}
-            `;
-            list.appendChild(div);
-        });
-    } catch (err) {
-        console.error("Error fetching requests:", err);
-    }
+  data.forEach(req => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <p><b>ID:</b> ${req.residentId}</p>
+      <p>Status: ${req.status}</p>
+      ${req.status === "pending" ? `<button onclick="approveEdit('${req._id}')">Approve</button>` : ""}
+    `;
+    list.appendChild(div);
+  });
 }
 
 function approveEdit(id){
