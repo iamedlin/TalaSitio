@@ -118,7 +118,7 @@ body.dark .card { background: #1e1e1e; }
 
 .card h3 { font-size: 22px; margin-bottom: 15px; }
 
-.card p { font-size: 36px; font-weight: bold; margin: 0; }
+.card p { font-size: 12px; font-weight: bold; margin: 0; }
 
 /* SITIO BUTTONS (LARGER) */
 .sitio-container {
