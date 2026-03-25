@@ -47,9 +47,12 @@
     font-weight: 800;
     letter-spacing: 6px;
     font-family: 'Oswald', sans-serif;
+    .sidebar h2 {
     background: linear-gradient(180deg, #e9cece, #4040dd);
-    -webkit-background-clip: text;
+    background-clip: text;        /* standard property */
+    -webkit-background-clip: text; /* for Chrome, Safari */
     -webkit-text-fill-color: transparent;
+    }
 }
 
 .sidebar a {
