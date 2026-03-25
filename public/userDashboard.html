@@ -4,61 +4,171 @@
 
 <title>User Dashboard</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 
-body{
-font-family:Arial;
-margin:0;
-background:#f4f4f4;
-}
-.profile-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    color: #cfd8ff;
+
+    background: 
+        linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
+        url("images/loading.png") no-repeat center center/cover;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
-.profile-card{
-    background:white;
-    padding:20px;
-    border-radius:8px;
-    margin-bottom:20px;
-}
-.header{
-background:#2c7be5;
-color:white;
-padding:20px;
-display:flex;
-justify-content:space-between;
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.container{
-padding:30px;
+.sidebar-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 20px;
 }
 
-.card{
-background:white;
-padding:20px;
-border-radius:8px;
-margin-bottom:20px;
+.sidebar h2 {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    font-family: 'Oswald', sans-serif;
+
+    background: linear-gradient(180deg, #e9cece, #4040dd);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
-.resident-card{
-background:white;
-padding:15px;
-border-radius:8px;
-margin-bottom:10px;
-border:1px solid #ddd;
+/* ---------- MAIN ---------- */
+html, body {
+    height: 100%;
 }
 
-button{
-padding:10px;
-background:red;
-border:none;
-color:white;
-cursor:pointer;
+body {
+    font-family: Arial;
+    margin: 0;
+
+    background: 
+        linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+        url("images/bg.png") no-repeat center center/cover;
+
+    background-attachment: fixed; /* 🔥 keeps it full & smooth */
 }
 
+/* Push content to the right of sidebar */
+.main {
+    margin-left: 200px;
+}
+
+
+/* HEADER (FIXED) */
+.header {
+    background: rgba(3, 28, 77, 0.871);
+    color: white;
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-left: 40px; /* 🔥 prevents overlap */
+}
+
+/* CONTAINER */
+.container {
+    padding: 30px 40px;
+    max-width: 900px;
+    margin: 20px auto;
+}
+
+/* CARDS */
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.profile-card {
+    background: #f9fafc;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border-left: 5px solid #2c7be5;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.resident-card {
+    background: #ffffff;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid #2ecc71;
+}
+
+/* BUTTON */
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* LOGOUT BUTTON */
+.header button {
+    background: #e74c3c;
+}
+
+.header button:hover {
+    background: #c0392b;
+    transform: scale(1.05);
+}
+
+/* EDIT BUTTON */
+.edit-btn {
+    background: #3498db;
+    margin-right: 10px;
+}
+
+.edit-btn:hover {
+    background: #2c80b4;
+    transform: translateY(-2px);
+}
+
+/* CHANGE PASSWORD BUTTON */
+.pass-btn {
+    background: #2ecc71;
+}
+
+.pass-btn:hover {
+    background: #27ae60;
+    transform: translateY(-2px);
+}
+
+/* INPUT GROUP */
 .input-group {
     position: relative;
 }
@@ -66,7 +176,7 @@ cursor:pointer;
 .input-group input {
     width: 100%;
     padding: 12px;
-    padding-right: 40px; /* space for icon */
+    padding-right: 40px;
     margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 8px;
@@ -78,22 +188,102 @@ cursor:pointer;
     top: 50%;
     transform: translateY(-50%);
     cursor: pointer;
-    font-size: 18px;
 }
 
+/* LOGOUT MODAL STYLES */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed;
+    z-index: 999; /* on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5); /* semi-transparent background */
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px 30px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#confirmLogout {
+    background: #e74c3c;
+    color: white;
+}
+
+#cancelLogout {
+    background: #3498db;
+    color: white;
+}
+
+.portal-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    /* Gradient text */
+    background:  #fbfbfb;
+    background-clip: text;        /* standard property */
+    -webkit-background-clip: text; /* for Chrome, Safari */
+    -webkit-text-fill-color: transparent;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
 </style>
 
 </head>
 
 <body>
 
-<div class="header">
-
-<h2>TalaSitio Resident Portal</h2>
-
-<button onclick="logout()">Logout</button>
-
+    <!-- LOGOUT MODAL -->
+<div id="logoutModal" class="modal">
+  <div class="modal-content">
+    <h3>Are you sure you want to log out?</h3>
+    <div class="modal-buttons">
+      <button id="confirmLogout">Yes, Log Out</button>
+      <button id="cancelLogout">Cancel</button>
+    </div>
+  </div>
 </div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-content">
+    <img src="images/loading.png" class="sidebar-logo">
+    <h2>TALASITIO</h2>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<div class="header">
+<h2 class="portal-title">TalaSitio Resident Portal</h2>
+<button onclick="logout()">Logout</button>
+</div>
+
+
 
 <div class="container">
 
@@ -101,7 +291,8 @@ cursor:pointer;
     <h3>Loading...</h3>
     <p>Please wait...</p>
 </div>
-<div id="passwordSection" class="password-card" style="display: none;">
+
+<div id="passwordSection" style="display: none;">
     <h3>Change Password</h3>
 
     <div class="input-group">
@@ -117,56 +308,44 @@ cursor:pointer;
     <button onclick="changePassword()">Update Password</button>
 </div>
 
+</div>
+</div>
+
 <script>
 const token = localStorage.getItem("token");
 
-// Redirect to login if no token
 if (!token) {
     window.location.href = "login.html";
 }
 
-// Logout function
 function logout() {
-    if (confirm("Do you want to log out?")) {
-        localStorage.removeItem("token");
-        window.location.href = "login.html";
-    }
+    // Show the modal
+    document.getElementById("logoutModal").style.display = "flex";
 }
-function requestEdit(residentId) {
-    const newName = prompt("Enter new name:");
 
-    if (!newName) return; // Cancel pressed
+// Confirm and Cancel buttons
+document.getElementById("confirmLogout").addEventListener("click", () => {
+    localStorage.removeItem("token");
+    window.location.href = "login.html";
+});
 
-    fetch("http://localhost:5000/edit-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            residentId,
-            newData: {
-                $set: { "head.name": newName } // Use $set for nested update
-            }
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-    })
-    .catch(err => console.error(err));
-}
+document.getElementById("cancelLogout").addEventListener("click", () => {
+    document.getElementById("logoutModal").style.display = "none";
+});
+
+
 function goToEdit(){
     window.location.href = "edit.html";
 }
-// Fetch current user info
+
 async function getCurrentUser() {
     try {
-        // 1. Get logged in user
         const res = await fetch("http://localhost:5000/api/auth/me", {
             headers: { "Authorization": `Bearer ${token}` }
         });
 
         if (!res.ok) {
-            const data = await res.json();
-            alert(data.message || "Session expired.");
+            alert("Session expired.");
             localStorage.removeItem("token");
             window.location.href = "login.html";
             return;
@@ -174,11 +353,9 @@ async function getCurrentUser() {
 
         const user = await res.json();
 
-        // 2. Fetch resident using email
         const residentRes = await fetch(`http://localhost:5000/residents/by-email/${user.email}`);
         const resident = await residentRes.json();
 
-        // 3. DISPLAY DATA
        document.querySelector(".card").innerHTML = `
     <div class="profile-header">
         <h2>${resident.head.name}</h2>
@@ -209,7 +386,7 @@ async function getCurrentUser() {
     <div class="profile-card">
         <h3>FAMILY MEMBERS</h3>
         ${
-            resident.familyMembers.length > 0
+            resident.familyMembers && resident.familyMembers.length > 0
             ? resident.familyMembers.map(member => `
                 <div class="resident-card">
                     <p><b>Name:</b> ${member.name}</p>
@@ -222,9 +399,10 @@ async function getCurrentUser() {
         }
     </div>
 
-    <br>
-    <button onclick="goToEdit()">Edit Info</button>
-    <button onclick="toggleChangePassword()">Change Password</button>
+    <div style="margin-top: 15px;">
+        <button class="edit-btn" onclick="goToEdit()">✏️ Edit Info</button>
+        <button class="pass-btn" onclick="toggleChangePassword()">🔒 Change Password</button>
+    </div>
 `;
 
     } catch (err) {
@@ -234,41 +412,6 @@ async function getCurrentUser() {
 }
 getCurrentUser();
 
-async function changePassword() {
-    const currentPassword = document.getElementById("currentPassword").value;
-    const newPassword = document.getElementById("newPassword").value;
-
-    if (!currentPassword || !newPassword) {
-        alert("Please fill all fields");
-        return;
-    }
-
-    try {
-        const res = await fetch("http://localhost:5000/api/auth/change-password", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                currentPassword,
-                newPassword
-            })
-        });
-
-        const data = await res.json();
-        alert(data.message);
-
-        if (res.ok) {
-            document.getElementById("currentPassword").value = "";
-            document.getElementById("newPassword").value = "";
-        }
-
-    } catch (err) {
-        console.error(err);
-        alert("Error changing password");
-    }
-}
 function togglePassword(inputId, el) {
     const input = document.getElementById(inputId);
 
@@ -280,16 +423,13 @@ function togglePassword(inputId, el) {
         el.textContent = "👁️";
     }
 }
+
 function toggleChangePassword() {
     const section = document.getElementById("passwordSection");
 
-    if (section.style.display === "none") {
-        section.style.display = "block";
-    } else {
-        section.style.display = "none";
-    }
+    section.style.display = section.style.display === "none" ? "block" : "none";
 }
-
 </script>
+
 </body>
 </html>
