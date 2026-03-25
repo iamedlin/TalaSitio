@@ -412,6 +412,42 @@ async function getCurrentUser() {
 }
 getCurrentUser();
 
+async function changePassword() {
+    const currentPassword = document.getElementById("currentPassword").value;
+    const newPassword = document.getElementById("newPassword").value;
+
+    if (!currentPassword || !newPassword) {
+        alert("Please fill in both fields");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:5000/api/auth/change-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ currentPassword, newPassword })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Failed to update password");
+            return;
+        }
+
+        alert("Password updated successfully!");
+        document.getElementById("currentPassword").value = "";
+        document.getElementById("newPassword").value = "";
+
+    } catch (err) {
+        console.error(err);
+        alert("Error updating password");
+    }
+}
+
 function togglePassword(inputId, el) {
     const input = document.getElementById(inputId);
 
