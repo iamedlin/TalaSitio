@@ -143,6 +143,7 @@ app.get("/api/auth/me", auth, async (req, res) => {
     res.json(user);
 });
 
+
 app.post("/edit-request", async (req, res) => {
     try {
         const { residentId, requestedBy, changes } = req.body;
@@ -173,36 +174,68 @@ app.get("/edit-requests", async (req, res) => {
 // Reject request
 app.put("/edit-request/reject/:id", async (req, res) => {
     try {
-        await EditRequest.findByIdAndUpdate(req.params.id, {
+        const request = await EditRequest.findByIdAndUpdate(req.params.id, {
             status: "rejected"
+        }, { new: true });
+
+        if(!request) return res.status(404).json({ message: "Request not found" });
+
+        // Get resident email
+        const resident = await Resident.findById(request.residentId);
+        const email = resident.head.email;
+
+        // Send email
+        await transporter.sendMail({
+            from: '"TalaSitio Portal" <itsedielynnase@gmail.com>',
+            to: email,
+            subject: "Edit Request Rejected ❌",
+            text: `Hello ${resident.head.name},\n\nYour edit request was rejected by the admin.\n\nPlease contact the admin for details.\n\nThank you,\nTalaSitio Team`
         });
 
-        res.json({ message: "Request rejected" });
+        res.json({ message: "Request rejected & email sent" });
+
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error(err);
+        res.status(500).json({ message: err.message });
     }
 });
 app.put("/edit-request/approve/:id", async (req, res) => {
-    const request = await EditRequest.findById(req.params.id);
+    try {
+        const request = await EditRequest.findById(req.params.id);
+        if(!request) return res.status(404).json({ message: "Request not found" });
 
-    const updates = {};
-
-    for (let key in request.changes) {
-        if(key === "familyMembers"){
-            updates["familyMembers"] = request.changes[key].new;
-        } else {
-            updates[key] = request.changes[key].new;
+        const updates = {};
+        for (let key in request.changes) {
+            if(key === "familyMembers") {
+                updates["familyMembers"] = request.changes[key].new;
+            } else {
+                updates[key] = request.changes[key].new;
+            }
         }
+
+        await Resident.findByIdAndUpdate(request.residentId, { $set: updates });
+
+        request.status = "approved";
+        await request.save();
+
+        // Get resident email
+        const resident = await Resident.findById(request.residentId);
+        const email = resident.head.email;
+
+        // Send email
+        await transporter.sendMail({
+            from: '"TalaSitio Portal" <itsedielynnase@gmail.com>',
+            to: email,
+            subject: "Edit Request Approved ✅",
+            text: `Hello ${resident.head.name},\n\nYour edit request has been approved and the changes are now reflected in your profile.\n\nThank you,\nTalaSitio Team`
+        });
+
+        res.json({ message: "Approved & email sent" });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: err.message });
     }
-
-    await Resident.findByIdAndUpdate(request.residentId, {
-        $set: updates
-    });
-
-    request.status = "approved";
-    await request.save();
-
-    res.json({ message: "Approved & updated" });
 });
 
 /* =========================
@@ -245,34 +278,76 @@ app.get("/residents/:id", async (req, res) => {
 /* =========================
    CREATE RESIDENT (FIXED)
 ========================= */
+/* =========================
+   CREATE RESIDENT & SEND EMAIL
+========================= */
 app.post("/residents", async (req, res) => {
     try {
         const { head, familyMembers, sitio } = req.body;
 
+        // 1️⃣ Save resident
         const newResident = new Resident({
             head,
             familyMembers: familyMembers || [],
-            sitio: Number(sitio) // 🔥 FIXED (number)
+            sitio: Number(sitio)
         });
 
         await newResident.save();
 
+        // 2️⃣ Create user account
         const email = head.email;
-        const rawPassword = head.birthdate.replace(/-/g, "");
+        const rawPassword = head.birthdate.replace(/-/g, ""); // simple password
         const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
-       await User.create({
-    name: head.name,
-    email,
-    password: hashedPassword,
-    role: "user" // ✅ ADD THIS
-});
+        const newUser = await User.create({
+            name: head.name,
+            email,
+            password: hashedPassword,
+            role: "user"
+        });
 
-        res.json({ message: "Saved successfully" });
+        // 3️⃣ Send email with credentials
+        let transporter = nodemailer.createTransport({
+            service: "Gmail",
+            auth: {
+                user: "itsedielynnase@gmail.com",
+                pass: "ipro yzvv onps zilm" // Make sure this app password is valid
+            }
+        });
+
+        const mailOptions = {
+            from: '"TalaSitio Admin" <itsedielynnase@gmail.com>',
+            to: email,
+            subject: "Your TalaSitio Account Credentials",
+            html: `
+                <p>Hello ${head.name},</p>
+                <p>Your account has been created for TalaSitio.</p>
+                <p><strong>Email:</strong> ${email}</p>
+                <p><strong>Password:</strong> ${rawPassword}</p>
+                <p>Please login and change your password immediately.</p>
+                <p>Thank you!</p>
+            `
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        res.json({ message: "Resident and user created successfully, email sent!" });
 
     } catch (err) {
+        console.error("CREATE RESIDENT ERROR:", err);
+        res.status(500).json({ message: "Error saving resident", error: err.message });
+    }
+});
+
+// GET resident by head email
+app.get("/residents/by-email/:email", async (req, res) => {
+    try {
+        const resident = await Resident.findOne({ "head.email": req.params.email });
+        if (!resident) return res.status(404).json({ message: "Resident not found" });
+        res.json(resident);
+    } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Error saving resident" });
+        res.status(500).json({ message: "Server error" });
     }
 });
 
@@ -400,6 +475,25 @@ app.post("/reset-password", async (req, res) => {
         console.error("Reset-password route error:", err); // 🔥 full error
         res.status(500).json({ message: "Server error", error: err.message });
     }
+});
+
+// DELETE edit request
+app.delete("/edit-request/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const request = await EditRequest.findByIdAndDelete(id);
+
+    if (!request) return res.status(404).json({ message: "Request not found" });
+
+    // Optionally send email to user notifying deletion
+    // await sendEmail(request.email, "Your request was deleted", "Message...");
+
+    res.json({ message: "Request deleted successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
