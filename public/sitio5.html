@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sitio 1</title>
+    <link rel="stylesheet" href="style2.css">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+</head>
+
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-content">
+        <img src="images/loading.png" alt="Logo" class="sidebar-logo">
+        <h2>TALASITIO</h2>
+    </div>
+</div>
+
+<div class="main">
+
+   <div class="top-bar">
+    <h1>🏡 Sitio 5 Dashboard</h1>
+
+    <div style="display:flex; gap:10px;">
+        <button class="add-btn"
+            onclick="window.location.href='addResident.html'">
+            + Add Resident
+        </button>
+
+        <button class="exit-btn" onclick="goBack()">
+            ⬅ Exit
+        </button>
+    </div>
+</div>
+
+    <!-- 🔵 STATS -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h4>Population</h4>
+            <h2 id="totalPopulation">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Senior Citizens</h4>
+            <h2 id="seniorCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Unemployed</h4>
+            <h2 id="unemployedCount">0</h2>
+        </div>
+
+        <div class="stat-card">
+            <h4>Out of School</h4>
+            <h2 id="outOfSchool">0</h2>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <div class="card">
+            <h2>Residents</h2>
+            <div id="residentList" class="resident-grid"></div>
+        </div>
+
+        <div class="card">
+            <h2>Population Chart</h2>
+            <canvas id="chartCanvas"></canvas>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="theme.js"></script>
+
+<script>
+  
+const token = localStorage.getItem("token");
+let chart;
+ 
+
+/* VIEW PROFILE */
+function viewProfile(id){
+    window.location.href = `profile.html?id=${id}`;
+}
+function goBack() {
+    window.location.href = "adminDashboard.html";
+}
+
+
+/* CHART */
+function renderChart(residents){
+
+    const ageGroups = {
+        "0-17": 0,
+        "18-35": 0,
+        "36-60": 0,
+        "60+": 0
+    };
+
+    residents.forEach(r => {
+
+        if (r.head?.age != null) {
+            const age = r.head.age;
+
+            if(age <= 17) ageGroups["0-17"]++;
+            else if(age <= 35) ageGroups["18-35"]++;
+            else if(age <= 60) ageGroups["36-60"]++;
+            else ageGroups["60+"]++;
+        }
+
+        if (r.familyMembers) {
+            r.familyMembers.forEach(m => {
+                if(m.age == null) return;
+
+                const age = m.age;
+
+                if(age <= 17) ageGroups["0-17"]++;
+                else if(age <= 35) ageGroups["18-35"]++;
+                else if(age <= 60) ageGroups["36-60"]++;
+                else ageGroups["60+"]++;
+            });
+        }
+
+    });
+
+    const ctx = document.getElementById("chartCanvas");
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(ageGroups),
+            datasets: [{
+                data: Object.values(ageGroups)
+            }]
+        }
+    });
+}
+
+/* LOAD DATA */
+async function loadResidents(){
+
+    const container = document.getElementById("residentList");
+    container.innerHTML = "Loading...";
+
+    try {
+
+        const res = await fetch("http://localhost:5000/residents/sitio/5", {
+            headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        const residents = await res.json();
+
+        let totalPopulation = 0;
+        let seniorCount = 0;
+        let unemployedCount = 0;
+        let outOfSchool = 0;
+
+        residents.forEach(r => {
+
+            // HEAD
+            if (r.head) {
+                totalPopulation++;
+
+                const age = r.head.age;
+                if (age >= 60) seniorCount++;
+
+               if (!r.head.work || r.head.work.trim() === "") {
+                     unemployedCount++;
+
+                     if (age >= 6 && age <= 24) { // typical school age
+                      outOfSchool++;
+                       }
+                    }
+            }
+
+            // FAMILY
+            if (r.familyMembers) {
+                r.familyMembers.forEach(m => {
+                    totalPopulation++;
+
+                    const age = m.age;
+
+                    if (age >= 60) seniorCount++;
+
+if (!m.occupation || m.occupation.trim() === "") {
+    unemployedCount++;
+
+    if (age >= 6 && age <= 24) {
+        outOfSchool++;
+    }
+}
+                });
+            }
+
+        });
+
+        // DISPLAY
+        document.getElementById("totalPopulation").innerText = totalPopulation;
+        document.getElementById("seniorCount").innerText = seniorCount;
+        document.getElementById("unemployedCount").innerText = unemployedCount;
+        document.getElementById("outOfSchool").innerText = outOfSchool;
+
+        renderChart(residents);
+
+        container.innerHTML = "";
+
+        residents.forEach(res => {
+            const div = document.createElement("div");
+            div.classList.add("resident-card");
+
+            div.innerHTML = `
+                <h3>${res.head?.name || "No Name"}</h3>
+                <p>Age: ${res.head?.age || "N/A"}</p>
+                <p>Family: ${res.familyMembers?.length || 0}</p>
+
+                <button onclick="viewProfile('${res._id}')">View Family</button>
+                <button onclick="deleteResident('${res._id}')">Remove</button>
+
+                <div id="family-${res._id}" style="display:none;"></div>
+            `;
+
+            container.appendChild(div);
+        });
+
+    } catch(err){
+        console.error(err);
+    }
+}
+
+loadResidents();
+
+/* TOGGLE FAMILY */
+function toggleFamily(id){
+    const container = document.getElementById(`family-${id}`);
+
+    if(container.style.display === "none"){
+        container.style.display = "block";
+
+        fetch("http://localhost:5000/residents/sitio/5", {
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+            const resident = data.find(r => r._id === id);
+
+            container.innerHTML = resident.familyMembers.map(m => `
+                <p>👤 ${m.name} (${m.relation}) - Age: ${m.age}</p>
+            `).join("");
+        });
+
+    } else {
+        container.style.display = "none";
+    }
+}
+
+/* DELETE */
+async function deleteResident(id){
+
+    if(!confirm("Delete this resident?")) return;
+
+    await fetch(`http://localhost:5000/residents/${id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${token}` }
+    });
+
+    loadResidents();
+}
+</script>
+
+</body>
+</html>

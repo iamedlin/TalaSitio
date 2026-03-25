@@ -3,15 +3,20 @@
 <head>
     <title>Sitio 1</title>
     <link rel="stylesheet" href="style2.css">
-
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
 </head>
 
 <body>
 
 <div class="sidebar">
-    <h2>TalaSitio</h2>
+    <div class="sidebar-content">
+        <img src="images/loading.png" alt="Logo" class="sidebar-logo">
+        <h2>TALASITIO</h2>
+    </div>
 </div>
 
 <div class="main">
@@ -70,9 +75,13 @@
 
 </div>
 
+<script src="theme.js"></script>
+
 <script>
+  
 const token = localStorage.getItem("token");
 let chart;
+ 
 
 /* VIEW PROFILE */
 function viewProfile(id){
@@ -81,6 +90,8 @@ function viewProfile(id){
 function goBack() {
     window.location.href = "adminDashboard.html";
 }
+
+
 /* CHART */
 function renderChart(residents){
 

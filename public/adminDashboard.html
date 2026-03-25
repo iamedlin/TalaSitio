@@ -7,13 +7,31 @@
 
 <style>
 * { box-sizing: border-box; font-family: Arial, sans-serif; }
-body { margin: 0; background: #f4f6f9; transition: background .3s, color .3s; }
+body { margin: 0; background: transparent; }
 body.dark { background: #121212; color: #e4e4e4; }
 
-/* SIDEBAR */
+/* BACKGROUND IMAGE WITH 50% OPACITY */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("images/bg.png") no-repeat center center/cover;
+  opacity: 0.5; /* 50% opacity */
+  z-index: -1;
+}
+
 .sidebar {
-  position: fixed; left: 0; top: 0; bottom: 0;
-  width: 230px; background: #1f2a44; color: #fff; padding: 20px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 230px;
+  padding: 20px;
+  color: #fff;
+
+  background:
+    linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
+    url("images/loading.png") no-repeat center center/cover;
 }
 body.dark .sidebar { background: #0d1528; }
 .sidebar a {
@@ -26,7 +44,7 @@ body.dark .sidebar { background: #0d1528; }
 /* MAIN */
 .main { margin-left: 230px; padding: 20px; }
 .topbar {
-  background: #fff; padding: 15px 20px;
+  background: #f4ecec; padding: 15px 20px;
   border-radius: 12px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.08);
   display: flex; justify-content: space-between;
@@ -43,7 +61,7 @@ body.dark .topbar { background: #1e1e1e; }
   justify-items: center;
 }
 .card {
-  background: #fff; padding: 40px 20px;
+  background: #f2e7e7; padding: 40px 20px;
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   text-align: center;
@@ -131,6 +149,20 @@ body.dark .settings-box { background: #1e1e1e; }
 .request-box { display: none; position: absolute; top: 50px; right: 20px; width: 300px; background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
 .request-box h3 { margin-top: 0; }
 .notification-btn { padding: 10px 14px; border-radius: 50%; border: none; cursor: pointer; background: #1f2a44; color: #fff; font-size: 16px; }
+
+.logo-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-title img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+
 </style>
 </head>
 
@@ -138,12 +170,16 @@ body.dark .settings-box { background: #1e1e1e; }
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-  <h2>🏡 TalaSitio</h2>
+ <h2 class="logo-title">
+  <img src="images/loading.png" alt="Logo">
+  TalaSitio
+</h2>
   <a onclick="showSection('dashboard')">📊 Dashboard</a>
   <a onclick="showSection('residents')">👥 Residents</a>
   <a onclick="showSection('requests')">📝 Requests</a>
   <a onclick="showSection('settings')">⚙️ Settings</a>
   <a onclick="openLogoutModal()">🚪 Logout</a>
+  
 </div>
 
 <!-- MAIN -->
@@ -258,6 +294,9 @@ body.dark .settings-box { background: #1e1e1e; }
   </div>
 </div>
 
+
+<script src="theme.js"></script>
+
 <script>
 const token = localStorage.getItem("token");
 if(!token) window.location.href="login.html";
@@ -271,7 +310,7 @@ function closeRequestBox(){
   document.getElementById("requestBox").style.display = "none";
 }
 
-function toggleDarkMode() { document.body.classList.toggle('dark'); }
+
 
 function saveSettings(){
   const username = document.getElementById('usernameInput').value;

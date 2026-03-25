@@ -7,14 +7,46 @@ body {
 .sidebar {
     width: 200px;
     height: 100vh;
-    background: #1e3c72;
-    color: white;
     position: fixed;
     padding: 20px;
-}
+    color: blue;
 
-.sidebar h2 {
+    /* 🔥 Background (keep yours if already added) */
+    background: 
+        linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
+        url("images/loading.png") no-repeat center center/cover;
+
+    /* ✅ CENTER CONTENT */
+    display: flex;
+    justify-content: center;   /* horizontal */
+    align-items: center;       /* vertical */
+    text-align: center;
+   
+}
+.sidebar-content {
+    display: flex;
+    flex-direction: column;  /* stack logo + text */
+    align-items: center;
+}
+.sidebar-logo {
+    width: 90px;      /* adjust size */
+    height: 90px;
+    object-fit: contain;
     margin-bottom: 20px;
+}
+.sidebar h2 {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    font-family: 'Oswald', sans-serif;
+
+    background: linear-gradient(180deg, #e9cece, #4040dd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+     
 }
 
 .sidebar a {
@@ -47,7 +79,7 @@ body {
 /* STATS */
 /* Move stats grid slightly away from sidebar */
 .stats-grid {
-    margin-left: 20px; /* increase this to push further */
+    margin-left: 30px; /* increase this to push further */
     margin-top: 20px;  /* optional, to move down a bit */
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -160,4 +192,44 @@ button {
 
 .exit-btn:hover {
     background: #5a6268;
+}
+/* 🌙 DARK MODE */
+body.dark {
+    background: #121212;
+    color: #e4e4e4;
+}
+
+/* Sidebar */
+body.dark .sidebar {
+    background: 
+        linear-gradient(rgba(13, 21, 40, 0.8), rgba(13, 21, 40, 0.8)),
+        url("images/loading.png") no-repeat center center/cover;
+}
+/* Cards */
+body.dark .card,
+body.dark .profile-card {
+    background: #1e1e1e;
+    color: #e4e4e4;
+}
+
+/* Stat Cards */
+body.dark .stat-card {
+    background: linear-gradient(135deg, #0d1528, #1e2a4a);
+}
+
+/* Resident Cards */
+body.dark .resident-card,
+body.dark .family-card,
+body.dark .family-member {
+    background: #2a2a2a;
+    color: #e4e4e4;
+}
+
+/* Buttons */
+body.dark .add-btn {
+    background: #3a5ba0;
+}
+
+body.dark .exit-btn {
+    background: #444;
 }
