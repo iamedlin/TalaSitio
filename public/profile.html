@@ -90,7 +90,7 @@ function editProfile(){
 }
 
 function goBack(){
-    window.location.href = "sitio1.html";
+    window.location.href = "sitio.html?sitio=" + localStorage.getItem("sitioId");
 }
 
 loadProfile();
