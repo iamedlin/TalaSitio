@@ -289,6 +289,29 @@ async function loadUser(){
 
 loadUser();
 
+/* UPDATE */
+async function updateMyInfo() {
+  const btn = document.querySelector("#updateCard button");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+
+  // Grab inputs explicitly
+  const myNameInput = document.getElementById("myName");
+  const myEmailInput = document.getElementById("myEmail");
+  const myPasswordInput = document.getElementById("myPassword");
+
+  try {
+    const res = await fetch("http://localhost:5000/update-me", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: myNameInput.value,
+        email: myEmailInput.value,
+        password: myPasswordInput.value
+      })
 async function updateMyInfo(){
   const name = document.getElementById("myName").value;
   const email = document.getElementById("myEmail").value;
@@ -298,8 +321,69 @@ async function updateMyInfo(){
       method: "PUT",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ name, email, password })
+
     });
     const data = await res.json();
+
+    if(res.ok){
+      showToast(data.message || "Updated!", "success");
+      myPasswordInput.value = ""; // Clear password field after update
+    } else {
+      showToast(data.message || "Error updating", "error");
+    }
+
+  } catch (err) {
+    console.error(err);
+    showToast("Network error", "error");
+  }
+
+  btn.disabled = false;
+  btn.textContent = "Save Changes";
+}
+/* CREATE */
+async function createAccount() {
+  // Grab inputs
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const roleSelect = document.getElementById("role");
+
+  // Validate
+  if (!nameInput.value || !emailInput.value || !passwordInput.value) {
+    showToast("Fill all fields", "error");
+    return;
+  }
+
+  try {
+    const res = await fetch("http://localhost:5000/create-user", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: nameInput.value,
+        email: emailInput.value,
+        password: passwordInput.value,
+        role: roleSelect.value
+      })
+    });
+
+    const data = await res.json();
+    if(res.ok){
+      showToast(data.message || "Account created!", "success");
+      // Optionally, clear fields
+      nameInput.value = "";
+      emailInput.value = "";
+      passwordInput.value = "";
+      roleSelect.value = "user";
+    } else {
+      showToast(data.message || "Error creating account", "error");
+    }
+  } catch (err) {
+    console.error(err);
+    showToast("Network error", "error");
+  }
     alert(data.message || "Updated!");
   } catch (err) { console.error(err); alert("Error updating info"); }
 }
@@ -320,6 +404,8 @@ async function createAccount(){
     alert(data.message || "Account created!");
   } catch (err) { console.error(err); alert("Error creating account"); }
 }
+
+
 </script>
 
 </body>
