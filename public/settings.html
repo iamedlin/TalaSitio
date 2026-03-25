@@ -6,6 +6,49 @@
 <title>Settings - TalaSitio</title>
 
 <style>
+  /* ===== SIDEBAR ===== */
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    position: fixed;
+    padding: 20px;
+    color: blue;
+
+    background: 
+        linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
+        url("images/loading.png") no-repeat center center/cover;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+
+.sidebar h2 {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    font-family: 'Oswald', sans-serif;
+
+    background: linear-gradient(180deg, #e9cece, #4040dd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 * {
   margin: 0;
   padding: 0;
@@ -219,6 +262,12 @@ body.dark .card {
 </head>
 
 <body>
+  <div class="sidebar">
+  <div class="sidebar-content">
+    <img src="images/loading.png" alt="Logo" class="sidebar-logo">
+    <h2>TALASITIO</h2>
+  </div>
+</div>
 
 <div class="layout">
 
