@@ -28,10 +28,57 @@ button{padding:10px;margin-top:5px;border:none;color:white;cursor:pointer;width:
 <div class="card">
 
 <h3>HEAD INFO</h3>
-<input id="name" placeholder="Full Name">
-<input id="birthdate" type="date">
-<input id="contact" placeholder="Contact">
-<input id="occupation" placeholder="Occupation">
+ <div class="row">
+            <input type="text" id="firstName" placeholder="First Name" required>
+            <input type="text" id="middleName" placeholder="Middle Name" required>
+            <input type="text" id="lastName" placeholder="Last Name" required>
+        </div>
+
+        <!-- INFO -->
+        <div class="row">
+            <select id="gender" required>
+                <option value="">Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                 <option>Other</option>
+            </select>
+
+            <select id="civilStatus" required>
+                <option value="">Civil Status</option>
+                <option>Single</option>     
+                <option>Live-in</option>
+                <option>Married</option>
+                <option>Separated</option>
+                <option>Widowed</option>
+            </select>
+
+            <input type="text" id="nationality" placeholder="Nationality" required>
+        </div>
+
+        <!-- BIRTH -->
+        <div class="row">
+            <input type="date" id="birthdate" required>
+            <input type="number" id="age" readonly>
+            <input type="text" id="contact" placeholder="Contact" required>
+            <input type="email" id="email" placeholder="Email" required>
+        </div>
+
+        <!-- OTHER -->
+        <div class="row">
+            <select id="occupation" required>
+                <option value="">Occupation</option>
+                <option>Employed</option>
+                <option>Student</option>
+                <option>Unemployed</option>
+                <option>Self-employed</option>
+                <option>Out of School</option>
+
+            </select>
+
+            <input type="text" id="socialClass" placeholder="Social Class" required>
+            <input type="text" id="religion" placeholder="Religion" required>
+        </div>
+
 
 <h3>FAMILY MEMBERS</h3>
 <div id="familyContainer"></div>
@@ -92,11 +139,36 @@ function addFamilyMember(data = null){
   div.classList.add("family-member");
 
   div.innerHTML = `
-    <input class="memberName" placeholder="Name" value="${data?.name || ""}">
-    <input type="date" class="memberBirthdate" value="${data?.birthdate || ""}">
-    <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
-    <input class="memberOccupation" placeholder="Occupation" value="${data?.occupation || ""}">
-    <button class="remove" onclick="this.parentElement.remove()">❌ Remove</button>
+       <div class="row">
+            <input type="text" class="memberName" placeholder="Full Name" required>
+            <input type="text" class="memberRelation" placeholder="Relation" required>
+            <select class="memberOccupation" required>
+                <option value="">Occupation</option>
+                <option>Employed</option>
+                <option>Student</option>
+                <option>Unemployed</option>
+                <option>Self-employed</option>
+                <option>Out of School</option>
+            </select>
+             <select id="memberGender" required>
+                <option value="">Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                 <option>Other</option>
+            </select>
+
+            <select id="memberCivilStatus" required>
+                <option value="">Civil Status</option>
+                <option>Single</option>     
+                <option>Live-in</option>
+                <option>Married</option>
+                <option>Separated</option>
+                <option>Widowed</option>
+            </select>
+            <input type="date" class="memberBirthdate" required>
+            <input type="number" class="memberAge" placeholder="Age" readonly>
+            <button type="button" class="remove-btn" onclick="this.closest('.family-card').remove()">Remove</button>
+        </div>
   `;
 
   document.getElementById("familyContainer").appendChild(div);

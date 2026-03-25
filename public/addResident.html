@@ -25,12 +25,16 @@
                 <option value="">Gender</option>
                 <option>Male</option>
                 <option>Female</option>
+                 <option>Other</option>
             </select>
 
             <select id="civilStatus" required>
                 <option value="">Civil Status</option>
-                <option>Single</option>
+                <option>Single</option>     
+                <option>Live-in</option>
                 <option>Married</option>
+                <option>Separated</option>
+                <option>Widowed</option>
             </select>
 
             <input type="text" id="nationality" placeholder="Nationality" required>
@@ -51,6 +55,9 @@
                 <option>Employed</option>
                 <option>Student</option>
                 <option>Unemployed</option>
+                <option>Self-employed</option>
+                <option>Out of School</option>
+
             </select>
 
             <input type="text" id="socialClass" placeholder="Social Class" required>
@@ -101,18 +108,46 @@ document.getElementById("birthdate").addEventListener("change", function () {
 function addFamilyMember(){
 
     const div = document.createElement("div");
+    div.classList.add("family-card");
 
     div.innerHTML = `
-        <input type="text" class="memberName" placeholder="Name" required>
-        <input type="date" class="memberBirthdate" required>
-        <input type="number" class="memberAge" readonly>
-        <input type="text" class="memberRelation" placeholder="Relation" required>
-        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+        <div class="row">
+            <input type="text" class="memberName" placeholder="Full Name" required>
+            <input type="text" class="memberRelation" placeholder="Relation" required>
+            <select class="memberOccupation" required>
+                <option value="">Occupation</option>
+                <option>Employed</option>
+                <option>Student</option>
+                <option>Unemployed</option>
+                <option>Self-employed</option>
+                <option>Out of School</option>
+            </select>
+             <select id="memberGender" required>
+                <option value="">Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                 <option>Other</option>
+            </select>
+
+            <select id="memberCivilStatus" required>
+                <option value="">Civil Status</option>
+                <option>Single</option>     
+                <option>Live-in</option>
+                <option>Married</option>
+                <option>Separated</option>
+                <option>Widowed</option>
+            </select>
+            <input type="date" class="memberBirthdate" required>
+            <input type="number" class="memberAge" placeholder="Age" readonly>
+            <button type="button" class="remove-btn" onclick="this.closest('.family-card').remove()">Remove</button>
+        </div>
+
         <hr>
     `;
 
     document.getElementById("familyContainer").appendChild(div);
 
+    // AUTO AGE
     div.querySelector(".memberBirthdate").addEventListener("change", function () {
 
         const birthdate = new Date(this.value);
@@ -138,12 +173,15 @@ document.getElementById("residentForm").addEventListener("submit", async functio
 
     document.querySelectorAll(".memberName").forEach((el, i) => {
 
-        members.push({
-            name: el.value,
-            birthdate: document.querySelectorAll(".memberBirthdate")[i].value,
-            age: Number(document.querySelectorAll(".memberAge")[i].value),
-            relation: document.querySelectorAll(".memberRelation")[i].value
-        });
+       members.push({
+    name: el.value,
+    birthdate: document.querySelectorAll(".memberBirthdate")[i].value,
+    age: Number(document.querySelectorAll(".memberAge")[i].value),
+    gender: document.querySelectorAll(".memberGender")[i].value,
+    civilStatus: document.querySelectorAll(".memberCivilStatus")[i].value,
+    relation: document.querySelectorAll(".memberRelation")[i].value,
+    occupation: document.querySelectorAll(".memberOccupation")[i].value
+});
 
     });
 
@@ -162,7 +200,7 @@ document.getElementById("residentForm").addEventListener("submit", async functio
             nationality: nationality.value
         },
         familyMembers: members,
-        sitio: sitioId // ✅ FIXED
+        sitio: sitioId 
     };
 
     console.log("SENDING:", data);

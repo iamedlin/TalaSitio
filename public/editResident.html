@@ -22,22 +22,61 @@
 
         <h3>HEAD INFORMATION</h3>
 
-        <div class="grid">
-            <input id="name" placeholder="Full Name">
-            <input id="birthdate" type="date">
-            <input id="age" type="number" readonly>
-
-            <input id="gender" placeholder="Gender">
-            <input id="civilStatus" placeholder="Civil Status">
-            <input id="nationality" placeholder="Nationality">
-
-            <input id="contact" placeholder="Contact">
-            <input id="email" placeholder="Email">
-
-            <input id="occupation" placeholder="Occupation">
-            <input id="socialClass" placeholder="Social Class">
-            <input id="religion" placeholder="Religion">
+        <!-- NAME -->
+        <div class="row">
+            <input type="text" id="firstName" placeholder="First Name" required>
+            <input type="text" id="middleName" placeholder="Middle Name" required>
+            <input type="text" id="lastName" placeholder="Last Name" required>
         </div>
+
+        <!-- INFO -->
+        <div class="row">
+            <select id="gender" required>
+                <option value="">Gender</option>
+                <option>Male</option>
+                <option>Female</option>
+                 <option>Other</option>
+            </select>
+
+            <select id="civilStatus" required>
+                <option value="">Civil Status</option>
+                <option>Single</option>     
+                <option>Live-in</option>
+                <option>Married</option>
+                <option>Separated</option>
+                <option>Widowed</option>
+            </select>
+
+            <input type="text" id="nationality" placeholder="Nationality" required>
+        </div>
+
+        <!-- BIRTH -->
+        <div class="row">
+            <input type="date" id="birthdate" required>
+            <input type="number" id="age" readonly>
+            <input type="text" id="contact" placeholder="Contact" required>
+            <input type="email" id="email" placeholder="Email" required>
+        </div>
+
+        <!-- OTHER -->
+        <div class="row">
+            <select id="occupation" required>
+                <option value="">Occupation</option>
+                <option>Employed</option>
+                <option>Student</option>
+                <option>Unemployed</option>
+                <option>Self-employed</option>
+                <option>Out of School</option>
+
+            </select>
+
+            <input type="text" id="socialClass" placeholder="Social Class" required>
+            <input type="text" id="religion" placeholder="Religion" required>
+        </div>
+
+        <h2 class="section-title">FAMILY MEMBERS</h2>
+
+        <div id="familyContainer"></div>
 
     </div>
 
@@ -58,7 +97,6 @@
 
 <script>
 const token = localStorage.getItem("token");
-
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 const sitio = params.get("sitio");
@@ -66,7 +104,7 @@ const sitio = params.get("sitio");
 let residentData;
 
 /* TAB SWITCH */
-function showTab(tab){
+function showTab(tab, e){
     document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
 
@@ -76,10 +114,10 @@ function showTab(tab){
         document.getElementById("familyTab").classList.add("active");
     }
 
-    event.target.classList.add("active");
+    e.target.classList.add("active");
 }
 
-/* LOAD */
+/* LOAD DATA */
 async function loadData(){
 
     const res = await fetch(`http://localhost:5000/residents/${id}`, {
@@ -87,39 +125,50 @@ async function loadData(){
     });
 
     residentData = await res.json();
+    const head = residentData.head || {};
 
-    const head = residentData.head;
+    // Fill head info
+    document.getElementById("firstName").value = head.firstName || "";
+    document.getElementById("middleName").value = head.middleName || "";
+    document.getElementById("lastName").value = head.lastName || "";
+    document.getElementById("birthdate").value = head.birthdate ? head.birthdate.split("T")[0] : "";
+    document.getElementById("age").value = head.age || "";
+    document.getElementById("gender").value = head.gender || "";
+    document.getElementById("civilStatus").value = head.civilStatus || "";
+    document.getElementById("nationality").value = head.nationality || "";
+    document.getElementById("contact").value = head.contact || "";
+    document.getElementById("email").value = head.email || "";
+    document.getElementById("occupation").value = head.occupation || "";
+    document.getElementById("socialClass").value = head.socialClass || "";
+    document.getElementById("religion").value = head.religion || "";
 
-    Object.keys(head).forEach(key => {
-        if(document.getElementById(key)){
-            document.getElementById(key).value = head[key] || "";
-        }
-    });
-
+    // Fill family members
     const container = document.getElementById("familyContainer");
     container.innerHTML = "";
-
     (residentData.familyMembers || []).forEach(m => addFamilyMember(m));
 }
 
-/* SAVE */
+/* SAVE CHANGES */
 async function saveChanges(){
 
     const members = [];
-
     document.querySelectorAll(".family-member").forEach(m => {
         members.push({
             name: m.querySelector(".memberName").value,
-            birthdate: m.querySelector(".memberBirthdate").value,
-            age: m.querySelector(".memberAge").value,
             relation: m.querySelector(".memberRelation").value,
-            occupation: m.querySelector(".memberOccupation").value
+            occupation: m.querySelector(".memberOccupation").value,
+            gender: m.querySelector(".memberGender").value,
+            civilStatus: m.querySelector(".memberCivilStatus").value,
+            birthdate: m.querySelector(".memberBirthdate").value,
+            age: m.querySelector(".memberAge").value
         });
     });
 
     const updated = {
         head: {
-            name: document.getElementById("name").value,
+            firstName: document.getElementById("firstName").value,
+            middleName: document.getElementById("middleName").value,
+            lastName: document.getElementById("lastName").value,
             birthdate: document.getElementById("birthdate").value,
             age: document.getElementById("age").value,
             gender: document.getElementById("gender").value,
@@ -147,25 +196,53 @@ async function saveChanges(){
     window.location.href = `profile.html?id=${id}&sitio=${sitio}`;
 }
 
-/* ADD FAMILY */
+/* ADD FAMILY MEMBER */
 function addFamilyMember(data = null){
 
     const div = document.createElement("div");
     div.classList.add("family-member");
 
     div.innerHTML = `
-        <input class="memberName" placeholder="Name" value="${data?.name || ""}">
-        <input type="date" class="memberBirthdate" value="${data?.birthdate || ""}">
-        <input type="number" class="memberAge" readonly value="${data?.age || ""}">
-        <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
-        <input class="memberOccupation" placeholder="Occupation" value="${data?.occupation || ""}">
-        <button class="remove" onclick="this.parentElement.remove()">✖</button>
+        <div class="row">
+            <input type="text" class="memberName" placeholder="Full Name" required value="${data?.name || ""}">
+            <input type="text" class="memberRelation" placeholder="Relation" required value="${data?.relation || ""}">
+            <select class="memberOccupation" required>
+                <option value="">Occupation</option>
+                <option ${data?.occupation === "Employed" ? "selected" : ""}>Employed</option>
+                <option ${data?.occupation === "Student" ? "selected" : ""}>Student</option>
+                <option ${data?.occupation === "Unemployed" ? "selected" : ""}>Unemployed</option>
+                <option ${data?.occupation === "Self-employed" ? "selected" : ""}>Self-employed</option>
+                <option ${data?.occupation === "Out of School" ? "selected" : ""}>Out of School</option>
+            </select>
+            <select class="memberGender" required>
+                <option value="">Gender</option>
+                <option ${data?.gender === "Male" ? "selected" : ""}>Male</option>
+                <option ${data?.gender === "Female" ? "selected" : ""}>Female</option>
+                <option ${data?.gender === "Other" ? "selected" : ""}>Other</option>
+            </select>
+            <select class="memberCivilStatus" required>
+                <option value="">Civil Status</option>
+                <option ${data?.civilStatus === "Single" ? "selected" : ""}>Single</option>
+                <option ${data?.civilStatus === "Live-in" ? "selected" : ""}>Live-in</option>
+                <option ${data?.civilStatus === "Married" ? "selected" : ""}>Married</option>
+                <option ${data?.civilStatus === "Separated" ? "selected" : ""}>Separated</option>
+                <option ${data?.civilStatus === "Widowed" ? "selected" : ""}>Widowed</option>
+            </select>
+            <input type="date" class="memberBirthdate" required value="${data?.birthdate || ""}">
+            <input type="number" class="memberAge" placeholder="Age" readonly value="${data?.age || ""}">
+            <button type="button" class="remove-btn" onclick="removeMember(this)">Remove</button>
+        </div>
     `;
 
     document.getElementById("familyContainer").appendChild(div);
 }
 
-/* AGE */
+/* REMOVE FAMILY MEMBER */
+function removeMember(btn){
+    btn.closest(".family-member").remove();
+}
+
+/* AGE CALCULATION */
 document.addEventListener("input", function(e){
     if(e.target.classList.contains("memberBirthdate")){
         const birth = new Date(e.target.value);
