@@ -307,10 +307,27 @@ body.dark .settings-box { background: #1e1e1e; }
   background: #1f2a44;
   color: #fff;
   font-size: 16px;
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+}
+.request-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+}
+
+.request-item:hover {
+    background: #f5f5f5;
+=======
+>>>>>>> Stashed changes
   transition: 0.3s;
 }
 
 .notification-btn:hover {
   transform: scale(1.1);
   background: #2f3b63;
+<<<<<<< Updated upstream
+=======
+>>>>>>> b9410c1d822904cce557630b74f616a65654f3b8
+>>>>>>> Stashed changes
 }

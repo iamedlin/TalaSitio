@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Edit Info</title>
+
+<style>
+body{font-family:Arial;margin:0;background:#f4f4f4;}
+.header{background:#2c7be5;color:white;padding:20px;display:flex;justify-content:space-between;}
+.container{padding:30px;}
+.card{background:white;padding:20px;border-radius:8px;max-width:600px;margin:auto;}
+input{width:100%;padding:10px;margin-bottom:10px;}
+button{padding:10px;margin-top:5px;border:none;color:white;cursor:pointer;width:100%;}
+.add{background:#3498db;}
+.save{background:#2ecc71;}
+.remove{background:red;}
+.family-member{border:1px solid #ddd;padding:10px;margin-bottom:10px;}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<h2>Edit Info</h2>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+<div class="card">
+
+<h3>HEAD INFO</h3>
+<input id="name" placeholder="Full Name">
+<input id="birthdate" type="date">
+<input id="contact" placeholder="Contact">
+<input id="occupation" placeholder="Occupation">
+
+<h3>FAMILY MEMBERS</h3>
+<div id="familyContainer"></div>
+
+<button class="add" onclick="addFamilyMember()">+ Add Member</button>
+
+<button id="submitBtn" class="save" onclick="submitEditRequest()" disabled>
+📩 Submit Request
+</button>
+
+</div>
+</div>
+
+<script>
+const token = localStorage.getItem("token");
+let residentData;
+
+if(!token) window.location.href="login.html";
+
+function logout(){
+  localStorage.removeItem("token");
+  window.location.href="login.html";
+}
+
+// LOAD DATA
+async function loadData(){
+
+  const userRes = await fetch("http://localhost:5000/api/auth/me", {
+    headers:{ "Authorization": `Bearer ${token}` }
+  });
+
+  const user = await userRes.json();
+
+  const res = await fetch(`http://localhost:5000/residents/by-email/${user.email}`);
+  residentData = await res.json();
+
+  const head = residentData.head;
+
+  document.getElementById("name").value = head.name || "";
+  document.getElementById("birthdate").value = head.birthdate || "";
+  document.getElementById("contact").value = head.contact || "";
+  document.getElementById("occupation").value = head.occupation || "";
+
+  const container = document.getElementById("familyContainer");
+  container.innerHTML = "";
+
+  (residentData.familyMembers || []).forEach(m => addFamilyMember(m));
+
+  // enable button AFTER load
+  document.getElementById("submitBtn").disabled = false;
+}
+
+loadData();
+
+// ADD FAMILY
+function addFamilyMember(data = null){
+  const div = document.createElement("div");
+  div.classList.add("family-member");
+
+  div.innerHTML = `
+    <input class="memberName" placeholder="Name" value="${data?.name || ""}">
+    <input type="date" class="memberBirthdate" value="${data?.birthdate || ""}">
+    <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
+    <input class="memberOccupation" placeholder="Occupation" value="${data?.occupation || ""}">
+    <button class="remove" onclick="this.parentElement.remove()">❌ Remove</button>
+  `;
+
+  document.getElementById("familyContainer").appendChild(div);
+}
+
+// SUBMIT REQUEST
+async function submitEditRequest(){
+
+  if (!residentData || !residentData.head) {
+    alert("Data not loaded yet.");
+    return;
+  }
+
+  const updatedHead = {
+    name: document.getElementById("name").value,
+    birthdate: document.getElementById("birthdate").value,
+    contact: document.getElementById("contact").value,
+    occupation: document.getElementById("occupation").value
+  };
+
+  const updatedMembers = [];
+
+  document.querySelectorAll(".family-member").forEach(m=>{
+    updatedMembers.push({
+      name: m.querySelector(".memberName").value,
+      birthdate: m.querySelector(".memberBirthdate").value,
+      relation: m.querySelector(".memberRelation").value,
+      occupation: m.querySelector(".memberOccupation").value
+    });
+  });
+
+  const changes = {};
+
+  // HEAD DIFF
+  for(let key in updatedHead){
+    if(residentData.head[key] !== updatedHead[key]){
+      changes[`head.${key}`] = {
+        old: residentData.head[key],
+        new: updatedHead[key]
+      };
+    }
+  }
+
+  // FAMILY DIFF
+  if(JSON.stringify(residentData.familyMembers) !== JSON.stringify(updatedMembers)){
+    changes["familyMembers"] = {
+      old: residentData.familyMembers,
+      new: updatedMembers
+    };
+  }
+
+  if(Object.keys(changes).length === 0){
+  alert("No changes detected");
+
+  // 🔥 DEBUG (optional)
+  console.log("NO CHANGES:", {
+    original: residentData,
+    updatedHead,
+    updatedMembers
+  });
+
+  return;
+}
+
+  console.log("SENDING REQUEST:", {
+    residentId: residentData._id,
+    requestedBy: residentData.head.name,
+    changes
+  });
+
+  try{
+    const res = await fetch("http://localhost:5000/edit-request", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        residentId: residentData._id,
+        requestedBy: residentData?.head?.name?.trim() || "Unknown User",
+        changes
+      })
+    });
+
+    const data = await res.json();
+    alert(data.message);
+
+    window.location.href="userDashboard.html";
+
+  }catch(err){
+    console.error(err);
+    alert("Error sending request");
+  }
+}
+</script>
+
+</body>
+</html>

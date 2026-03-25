@@ -213,7 +213,7 @@ body.dark .sitio-btn {
 <!-- SIDEBAR -->
 <div class="sidebar"> <h2 class="logo-title"> <img src="images/loading.png" alt="Logo"> TalaSitio </h2>
   <a onclick="showSection('dashboard')">📊 Dashboard</a>
-  <a onclick="showSection('settings')">⚙️ Settings</a>
+  <a href="settings.html">⚙️ Settings</a> 
   <a onclick="openLogoutModal()">🚪 Logout</a>
 </div>
 
@@ -247,6 +247,8 @@ body.dark .sitio-btn {
     </div>
   </div>
 
+<<<<<<< HEAD
+=======
   <!-- SETTINGS -->
   <div id="settings" class="section">
     <h2>Account & System Settings</h2>
@@ -267,6 +269,7 @@ body.dark .sitio-btn {
       <button onclick="saveSettings()">Save Changes</button>
     </div>
   </div>
+>>>>>>> b9410c1d822904cce557630b74f616a65654f3b8
 
 </div>
 
@@ -301,11 +304,19 @@ function toggleDarkMode(){
   document.body.classList.toggle('dark');
 }
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+function toggleDarkMode() { document.body.classList.toggle('dark'); }
+
+=======
+>>>>>>> Stashed changes
 function saveSettings(){
   const username = document.getElementById('usernameInput').value;
   if(username) document.getElementById('adminDisplay').textContent = username;
   document.getElementById('saveModal').style.display='flex';
 }
+>>>>>>> b9410c1d822904cce557630b74f616a65654f3b8
 
 function closeSaveModal(){
   document.getElementById('saveModal').style.display='none';
@@ -335,6 +346,7 @@ function toggleRequestsBox(){
 }
 
 async function fetchRequests(){
+<<<<<<< Updated upstream
   const res = await fetch("http://localhost:5000/edit-requests");
   const data = await res.json();
 
@@ -352,12 +364,164 @@ async function fetchRequests(){
   });
 }
 
+=======
+<<<<<<< HEAD
+    try {
+        const response = await fetch("http://localhost:5000/edit-requests");
+        const requests = await response.json();
+
+        const list = document.getElementById("requestList");
+        list.innerHTML = "";
+
+        requests.forEach(req => {
+            const div = document.createElement("div");
+            div.classList.add("request-item");
+
+            // Build changes HTML (hidden muna)
+            let changesHTML = "";
+            for (let key in req.changes) {
+                changesHTML += `
+  <p>
+    <b>${key}</b><br>
+    OLD: <span style="color:red">${JSON.stringify(req.changes[key].old)}</span><br>
+    NEW: <span style="color:green">${JSON.stringify(req.changes[key].new)}</span>
+  </p>
+`;
+            }
+
+            div.innerHTML = `
+                <div onclick="toggleDetails('${req._id}')" style="cursor:pointer;">
+                    <p><b>Resident ID:</b> ${req.residentId}</p>
+                    <p>Status: ${req.status}</p>
+                </div>
+
+                <div id="details-${req._id}" style="display:none; margin-left:10px;">
+                    <hr>
+                    <p><b>Changes:</b></p>
+                    ${changesHTML}
+
+                    ${req.status === "pending" 
+    ? `
+        <button onclick="approveEdit('${req._id}')">Approve</button>
+        <button onclick="rejectEdit('${req._id}')" style="background:red;color:white;">Reject</button>
+      `
+    : `<small>✔ ${req.status}</small>`
+}
+                </div>
+            `;
+
+            list.appendChild(div);
+        });
+
+    } catch (err) {
+        console.error("Error fetching requests:", err);
+    }
+
+    console.log(req.changes);
+}
+
+function toggleDetails(id){
+    const el = document.getElementById(`details-${id}`);
+    el.style.display = el.style.display === "none" ? "block" : "none";
+}
+
+function rejectEdit(id){
+    fetch(`http://localhost:5000/edit-request/reject/${id}`, {
+        method: "PUT"
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        fetchRequests();
+    })
+    .catch(err => console.error(err));
+}
+
+async function loadRequests() {
+    const res = await fetch("http://localhost:5000/edit-requests");
+    const data = await res.json();
+
+   const box = document.getElementById("requestBox");
+
+    box.innerHTML = data.map(req => `
+        <div class="card">
+            <p>Resident ID: ${req.residentId}</p>
+            <p>Status: ${req.status}</p>
+            <button onclick="approve('${req._id}')">Approve</button>
+        </div>
+    `).join("");
+}
+
+function approveEdit(id) {
+    fetch(`http://localhost:5000/edit-request/approve/${id}`, {
+        method: "PUT"
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        fetchRequests(); // refresh
+    });
+}
+
+async function approveRequest(id){
+  try {
+    await fetch(`http://localhost:5000/approve-request/${id}`, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${token}` }
+    });
+    fetchRequests();
+  } catch (err) {
+    console.error("Error approving request:", err);
+  }
+}
+
+// Toggle request box and fetch requests
+function toggleRequestsBox(){
+    const box = document.getElementById("requestBox");
+    box.style.display = box.style.display==='block' ? 'none':'block';
+    if(box.style.display==='block') fetchRequests();
+}
+
+// Approve edit request
+function approveEdit(id) {
+    fetch(`http://localhost:5000/edit-request/approve/${id}`, {
+        method: "PUT"
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.message);
+        fetchRequests(); // Refresh request list
+    })
+    .catch(err => console.error(err));
+=======
+  const res = await fetch("http://localhost:5000/edit-requests");
+  const data = await res.json();
+
+  const list = document.getElementById("requestList");
+  list.innerHTML = "";
+
+  data.forEach(req => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <p><b>ID:</b> ${req.residentId}</p>
+      <p>Status: ${req.status}</p>
+      ${req.status === "pending" ? `<button onclick="approveEdit('${req._id}')">Approve</button>` : ""}
+    `;
+    list.appendChild(div);
+  });
+}
+
+>>>>>>> Stashed changes
 function approveEdit(id){
   fetch(`http://localhost:5000/edit-request/approve/${id}`, {
     method: "PUT"
   })
   .then(res => res.json())
   .then(() => fetchRequests());
+<<<<<<< Updated upstream
+=======
+>>>>>>> b9410c1d822904cce557630b74f616a65654f3b8
+>>>>>>> Stashed changes
 }
 </script>
 

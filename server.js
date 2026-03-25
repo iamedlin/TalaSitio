@@ -21,8 +21,81 @@ app.use("/api/auth", authRoutes);
 
 const Resident = require("./models/Resident");
 const User = require("./models/User");
-const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt"); 
 const jwt = require("jsonwebtoken");
+
+app.put("/update-me", auth, async (req, res) => {
+  try {
+    const { name, email, password } = req.body;
+
+    const updateData = { name, email };
+
+    if(password){
+      const hashed = await bcrypt.hash(password, 10);
+      updateData.password = hashed;
+    }
+
+    await User.findByIdAndUpdate(req.user.id, updateData);
+
+    res.json({ message: "Profile updated successfully!" });
+
+  } catch (err) {
+    res.status(500).json({ message: "Update failed" });
+  }
+});
+app.post("/api/auth/change-password", auth, async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: "Current password is incorrect" });
+        }
+
+        // Hash new password
+        const hashed = await bcrypt.hash(newPassword, 10);
+        user.password = hashed;
+
+        await user.save();
+
+        res.json({ message: "Password updated successfully" });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+// CREATE USER (ADMIN ONLY)
+app.post("/create-user", async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    // hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new User({
+      name,
+      email,
+      password: hashedPassword,
+      role
+    });
+
+    await newUser.save();
+
+    res.json({ message: "User created successfully!" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error creating user" });
+  }
+});
 
 // Login route
 app.post("/api/auth/login", async (req, res) => {
@@ -67,11 +140,16 @@ app.get("/api/auth/me", auth, async (req, res) => {
 
 app.post("/edit-request", async (req, res) => {
     try {
-        const { residentId, newData } = req.body;
+        const { residentId, requestedBy, changes } = req.body;
+
+        if (!changes || Object.keys(changes).length === 0) {
+            return res.json({ message: "No changes detected" });
+        }
 
         const request = new EditRequest({
             residentId,
-            newData
+            requestedBy,
+            changes
         });
 
         await request.save();
@@ -79,35 +157,47 @@ app.post("/edit-request", async (req, res) => {
         res.json({ message: "Request sent for approval" });
 
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: err.message });
     }
 });
-
 app.get("/edit-requests", async (req, res) => {
     const requests = await EditRequest.find();
     res.json(requests);
 });
-
-app.put("/edit-request/approve/:id", async (req, res) => {
+// Reject request
+app.put("/edit-request/reject/:id", async (req, res) => {
     try {
-        const request = await EditRequest.findById(req.params.id);
+        await EditRequest.findByIdAndUpdate(req.params.id, {
+            status: "rejected"
+        });
 
-        if (!request) return res.status(404).json({ message: "Not found" });
-
-        // Apply changes
-        await Resident.findByIdAndUpdate(
-            request.residentId,
-            request.newData
-        );
-
-        request.status = "approved";
-        await request.save();
-
-        res.json({ message: "Approved & updated" });
-
+        res.json({ message: "Request rejected" });
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ error: err.message });
     }
+});
+app.put("/edit-request/approve/:id", async (req, res) => {
+    const request = await EditRequest.findById(req.params.id);
+
+    const updates = {};
+
+    for (let key in request.changes) {
+        if(key === "familyMembers"){
+            updates["familyMembers"] = request.changes[key].new;
+        } else {
+            updates[key] = request.changes[key].new;
+        }
+    }
+
+    await Resident.findByIdAndUpdate(request.residentId, {
+        $set: updates
+    });
+
+    request.status = "approved";
+    await request.save();
+
+    res.json({ message: "Approved & updated" });
 });
 
 /* =========================
