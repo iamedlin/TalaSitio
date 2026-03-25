@@ -280,6 +280,11 @@ app.put("/residents/:id", async (req, res) => {
     const resident = await Resident.findById(req.params.id);
     if (!resident) return res.status(404).send("Resident not found");
 
+    // Construct fullName for validation
+    const fullName = [head.firstName, head.middleName, head.lastName]
+        .filter(n => n && n.trim() !== "")
+        .join(" ");
+
     // Update head info
     resident.head = {
         firstName: head.firstName,
@@ -295,49 +300,14 @@ app.put("/residents/:id", async (req, res) => {
         occupation: head.occupation,
         socialClass: head.socialClass,
         religion: head.religion,
-        name: [head.firstName, head.middleName, head.lastName].filter(n => n).join(" ") // ← ADD THIS
+        name: fullName || "No Name Provided" // ✅ ensures required field
     };
 
     // Update family members
-    resident.familyMembers = familyMembers;
+    resident.familyMembers = familyMembers || [];
 
     await resident.save();
     res.json(resident);
-});
-/* =========================
-   DELETE RESIDENT
-========================= */
-app.delete("/edit-request/:id", async (req, res) => {
-  try {
-    const deleted = await EditRequest.findByIdAndDelete(req.params.id);
-
-    if (!deleted) {
-      return res.status(404).json({ message: "Request not found" });
-    }
-
-    res.json({ message: "Request deleted successfully" });
-
-  } catch (err) {
-    console.error("DELETE ERROR:", err);
-    res.status(500).json({ message: "Error deleting request" });
-  }
-});
-
-app.get("/residents/by-email/:email", async (req, res) => {
-    try {
-        const resident = await Resident.findOne({
-            "head.email": req.params.email
-        });
-
-        if (!resident) {
-            return res.status(404).json({ message: "Resident not found" });
-        }
-
-        res.json(resident);
-
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
 });
 /* =========================
    DELETE RESIDENT

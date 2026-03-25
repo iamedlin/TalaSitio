@@ -4,16 +4,160 @@
 <title>Edit Info</title>
 
 <style>
-body{font-family:Arial;margin:0;background:#f4f4f4;}
-.header{background:#2c7be5;color:white;padding:20px;display:flex;justify-content:space-between;}
-.container{padding:30px;}
-.card{background:white;padding:20px;border-radius:8px;max-width:600px;margin:auto;}
-input{width:100%;padding:10px;margin-bottom:10px;}
-button{padding:10px;margin-top:5px;border:none;color:white;cursor:pointer;width:100%;}
-.add{background:#3498db;}
-.save{background:#2ecc71;}
-.remove{background:red;}
-.family-member{border:1px solid #ddd;padding:10px;margin-bottom:10px;}
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* BODY */
+body{
+    font-family:'Segoe UI',sans-serif;
+    background:#f5f7fb;
+    color:#2d3436;
+}
+
+/* DARK MODE */
+body.dark{
+    background:#1e1e2f;
+    color:#f1f1f1;
+}
+
+/* HEADER */
+.header{
+    background:#2c7be5;
+    color:white;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.header button{
+    background:#1a68d1;
+    border:none;
+    padding:8px 12px;
+    border-radius:6px;
+    color:white;
+    cursor:pointer;
+}
+
+/* CONTAINER */
+.container{
+    padding:30px;
+}
+
+/* CARD */
+.card{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    max-width:900px;
+    margin:auto;
+    box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+
+body.dark .card{
+    background:#2c2c3e;
+}
+
+/* TITLE */
+h3{
+    margin-bottom:15px;
+}
+
+/* ROW */
+.row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:12px;
+}
+
+/* INPUTS */
+input,select{
+    flex:1;
+    min-width:150px;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ddd;
+    background:#f9fbff;
+    transition:.2s;
+}
+
+input:focus,select:focus{
+    border-color:#2c7be5;
+    outline:none;
+    background:white;
+}
+
+body.dark input,body.dark select{
+    background:#3a3a50;
+    color:white;
+    border:1px solid #555;
+}
+
+/* FAMILY CARD */
+.family-member{
+    border:1px solid #e6ecf5;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:12px;
+    background:#f8faff;
+}
+
+body.dark .family-member{
+    background:#2a2a3d;
+}
+
+/* BUTTONS */
+button{
+    border:none;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:500;
+    transition:.2s;
+}
+
+/* ACTION BUTTONS */
+.add{
+    background:#00b894;
+    color:white;
+    width:100%;
+    margin-top:10px;
+}
+.add:hover{background:#00a383;}
+
+.save{
+    background:#2c7be5;
+    color:white;
+    width:100%;
+    margin-top:10px;
+}
+.save:hover{background:#1a68d1;}
+
+.remove{
+    background:#ff7675;
+    color:white;
+    margin-top:10px;
+}
+.remove:hover{background:#e55050;}
+
+/* DARK TOGGLE */
+.toggle-dark{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#2c7be5;
+    color:white;
+    border:none;
+    padding:10px 12px;
+    border-radius:50%;
+    cursor:pointer;
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+    .row{flex-direction:column}
+}
 </style>
 </head>
 
@@ -28,57 +172,53 @@ button{padding:10px;margin-top:5px;border:none;color:white;cursor:pointer;width:
 <div class="card">
 
 <h3>HEAD INFO</h3>
- <div class="row">
-            <input type="text" id="firstName" placeholder="First Name" required>
-            <input type="text" id="middleName" placeholder="Middle Name" required>
-            <input type="text" id="lastName" placeholder="Last Name" required>
-        </div>
 
-        <!-- INFO -->
-        <div class="row">
-            <select id="gender" required>
-                <option value="">Gender</option>
-                <option>Male</option>
-                <option>Female</option>
-                 <option>Other</option>
-            </select>
+<div class="row">
+<input id="firstName" placeholder="First Name">
+<input id="middleName" placeholder="Middle Name">
+<input id="lastName" placeholder="Last Name">
+</div>
 
-            <select id="civilStatus" required>
-                <option value="">Civil Status</option>
-                <option>Single</option>     
-                <option>Live-in</option>
-                <option>Married</option>
-                <option>Separated</option>
-                <option>Widowed</option>
-            </select>
+<div class="row">
+<select id="gender">
+<option value="">Gender</option>
+<option>Male</option>
+<option>Female</option>
+<option>Other</option>
+</select>
 
-            <input type="text" id="nationality" placeholder="Nationality" required>
-        </div>
+<select id="civilStatus">
+<option value="">Civil Status</option>
+<option>Single</option>
+<option>Live-in</option>
+<option>Married</option>
+<option>Separated</option>
+<option>Widowed</option>
+</select>
 
-        <!-- BIRTH -->
-        <div class="row">
-            <input type="date" id="birthdate" required>
-            <input type="number" id="age" readonly>
-            <input type="text" id="contact" placeholder="Contact" required>
-            <input type="email" id="email" placeholder="Email" required>
-        </div>
+<input id="nationality" placeholder="Nationality">
+</div>
 
-        <!-- OTHER -->
-        <div class="row">
-            <select id="occupation" required>
-                <option value="">Occupation</option>
-                <option>Employed</option>
-                <option>Student</option>
-                <option>Unemployed</option>
-                <option>Self-employed</option>
-                <option>Out of School</option>
+<div class="row">
+<input type="date" id="birthdate">
+<input id="age" readonly placeholder="Age">
+<input id="contact" placeholder="Contact">
+<input id="email" placeholder="Email">
+</div>
 
-            </select>
+<div class="row">
+<select id="occupation">
+<option value="">Occupation</option>
+<option>Employed</option>
+<option>Student</option>
+<option>Unemployed</option>
+<option>Self-employed</option>
+<option>Out of School</option>
+</select>
 
-            <input type="text" id="socialClass" placeholder="Social Class" required>
-            <input type="text" id="religion" placeholder="Religion" required>
-        </div>
-
+<input id="socialClass" placeholder="Social Class">
+<input id="religion" placeholder="Religion">
+</div>
 
 <h3>FAMILY MEMBERS</h3>
 <div id="familyContainer"></div>
@@ -92,6 +232,8 @@ button{padding:10px;margin-top:5px;border:none;color:white;cursor:pointer;width:
 </div>
 </div>
 
+<button class="toggle-dark" onclick="toggleDark()">🌙</button>
+
 <script>
 const token = localStorage.getItem("token");
 let residentData;
@@ -103,9 +245,8 @@ function logout(){
   window.location.href="login.html";
 }
 
-// LOAD DATA
+/* LOAD */
 async function loadData(){
-
   const userRes = await fetch("http://localhost:5000/api/auth/me", {
     headers:{ "Authorization": `Bearer ${token}` }
   });
@@ -115,155 +256,148 @@ async function loadData(){
   const res = await fetch(`http://localhost:5000/residents/by-email/${user.email}`);
   residentData = await res.json();
 
- const head = residentData.head;
+  const head = residentData.head;
 
-// NAME
-if (head.name) {
-  const parts = head.name.split(" ");
-  document.getElementById("firstName").value = parts[0] || "";
-  document.getElementById("middleName").value = parts[1] || "";
-  document.getElementById("lastName").value = parts.slice(2).join(" ") || "";
-}
+  if(head.name){
+    const parts = head.name.split(" ");
+    firstName.value = parts[0]||"";
+    middleName.value = parts[1]||"";
+    lastName.value = parts.slice(2).join(" ")||"";
+  }
 
-// OTHER FIELDS
-document.getElementById("gender").value = head.gender || "";
-document.getElementById("civilStatus").value = head.civilStatus || "";
-document.getElementById("nationality").value = head.nationality || "";
+  gender.value=head.gender||"";
+  civilStatus.value=head.civilStatus||"";
+  nationality.value=head.nationality||"";
+  birthdate.value=head.birthdate||"";
+  contact.value=head.contact||"";
+  email.value=head.email||"";
+  occupation.value=head.occupation||"";
+  socialClass.value=head.socialClass||"";
+  religion.value=head.religion||"";
 
-document.getElementById("birthdate").value = head.birthdate || "";
-document.getElementById("contact").value = head.contact || "";
-document.getElementById("email").value = head.email || "";
+  const container=document.getElementById("familyContainer");
+  container.innerHTML="";
 
-document.getElementById("occupation").value = head.occupation || "";
-document.getElementById("socialClass").value = head.socialClass || "";
-document.getElementById("religion").value = head.religion || "";
+  (residentData.familyMembers||[]).forEach(m=>addFamilyMember(m));
 
-  const container = document.getElementById("familyContainer");
-  container.innerHTML = "";
-
-  (residentData.familyMembers || []).forEach(m => addFamilyMember(m));
-
-  // enable button AFTER load
-  document.getElementById("submitBtn").disabled = false;
+  submitBtn.disabled=false;
 }
 
 loadData();
 
-// ADD FAMILY
-function addFamilyMember(data = null){
+/* ADD FAMILY (FULL STRUCTURE) */
+function addFamilyMember(data = {}) {
   const div = document.createElement("div");
-  div.classList.add("family-member");
+  div.className = "family-member";
 
   div.innerHTML = `
-    <div class="row">
-      <input class="memberName" placeholder="Full Name" value="${data?.name || ""}">
-      <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
-      
-      <select class="memberOccupation">
-        <option value="">Occupation</option>
-        <option ${data?.occupation==="Employed"?"selected":""}>Employed</option>
-        <option ${data?.occupation==="Student"?"selected":""}>Student</option>
-        <option ${data?.occupation==="Unemployed"?"selected":""}>Unemployed</option>
-        <option ${data?.occupation==="Self-employed"?"selected":""}>Self-employed</option>
-        <option ${data?.occupation==="Out of School"?"selected":""}>Out of School</option>
-      </select>
+  <div class="row">
+    <input class="memberName" placeholder="Full Name" value="${data.name || ""}">
+    <input class="memberRelation" placeholder="Relation" value="${data.relation || ""}">
+  </div>
 
-      <input type="date" class="memberBirthdate" value="${data?.birthdate || ""}">
-      <button type="button" onclick="this.closest('.family-member').remove()">Remove</button>
-    </div>
+  <div class="row">
+    <select class="memberGender">
+      <option value="">Gender</option>
+      <option ${data.gender === "Male" ? "selected" : ""}>Male</option>
+      <option ${data.gender === "Female" ? "selected" : ""}>Female</option>
+      <option ${data.gender === "Other" ? "selected" : ""}>Other</option>
+    </select>
+
+    <select class="memberCivilStatus">
+      <option value="">Civil Status</option>
+      <option ${data.civilStatus === "Single" ? "selected" : ""}>Single</option>
+      <option ${data.civilStatus === "Live-in" ? "selected" : ""}>Live-in</option>
+      <option ${data.civilStatus === "Married" ? "selected" : ""}>Married</option>
+      <option ${data.civilStatus === "Separated" ? "selected" : ""}>Separated</option>
+      <option ${data.civilStatus === "Widowed" ? "selected" : ""}>Widowed</option>
+    </select>
+
+    <input class="memberOccupation" placeholder="Occupation" value="${data.occupation || ""}">
+  </div>
+
+  <div class="row">
+    <input type="date" class="memberBirthdate" value="${data.birthdate || ""}">
+    <input class="memberAge" readonly placeholder="Age" value="${data.age || ""}">
+  </div>
+
+  <button class="remove" onclick="this.closest('.family-member').remove()">Remove</button>
   `;
 
   document.getElementById("familyContainer").appendChild(div);
 }
 
-// SUBMIT REQUEST
+/* SUBMIT */
 async function submitEditRequest(){
 
-  if (!residentData || !residentData.head) {
-    alert("Data not loaded yet.");
-    return;
-  }
-
-  const updatedHead = {
-  name: `${document.getElementById("firstName").value} ${document.getElementById("middleName").value} ${document.getElementById("lastName").value}`.trim(),
-    birthdate: document.getElementById("birthdate").value,
-    contact: document.getElementById("contact").value,
-    occupation: document.getElementById("occupation").value
+  const updatedHead={
+    name:`${firstName.value} ${middleName.value} ${lastName.value}`.trim(),
+    birthdate:birthdate.value,
+    contact:contact.value,
+    occupation:occupation.value
   };
 
   const updatedMembers = [];
 
-  document.querySelectorAll(".family-member").forEach(m=>{
-    updatedMembers.push({
-      name: m.querySelector(".memberName").value,
-      birthdate: m.querySelector(".memberBirthdate").value,
-      relation: m.querySelector(".memberRelation").value,
-      occupation: m.querySelector(".memberOccupation").value
-    });
+document.querySelectorAll(".family-member").forEach(m => {
+  updatedMembers.push({
+    name: m.querySelector(".memberName").value,
+    relation: m.querySelector(".memberRelation").value,
+    gender: m.querySelector(".memberGender").value,
+    civilStatus: m.querySelector(".memberCivilStatus").value,
+    occupation: m.querySelector(".memberOccupation").value,
+    birthdate: m.querySelector(".memberBirthdate").value,
+    age: m.querySelector(".memberAge").value
   });
+});
 
-  const changes = {};
+  const changes={};
 
-  // HEAD DIFF
   for(let key in updatedHead){
-    if(residentData.head[key] !== updatedHead[key]){
-      changes[`head.${key}`] = {
-        old: residentData.head[key],
-        new: updatedHead[key]
-      };
+    if(residentData.head[key]!==updatedHead[key]){
+      changes[`head.${key}`]={old:residentData.head[key],new:updatedHead[key]};
     }
   }
 
-  // FAMILY DIFF
-  if(JSON.stringify(residentData.familyMembers) !== JSON.stringify(updatedMembers)){
-    changes["familyMembers"] = {
-      old: residentData.familyMembers,
-      new: updatedMembers
-    };
+  if(JSON.stringify(residentData.familyMembers)!==JSON.stringify(updatedMembers)){
+    changes["familyMembers"]={old:residentData.familyMembers,new:updatedMembers};
   }
 
-  if(Object.keys(changes).length === 0){
-  alert("No changes detected");
-
-  // 🔥 DEBUG (optional)
-  console.log("NO CHANGES:", {
-    original: residentData,
-    updatedHead,
-    updatedMembers
-  });
-
-  return;
-}
-
-  console.log("SENDING REQUEST:", {
-    residentId: residentData._id,
-    requestedBy: residentData.head.name,
-    changes
-  });
-
-  try{
-    const res = await fetch("http://localhost:5000/edit-request", {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({
-        residentId: residentData._id,
-        requestedBy: residentData?.head?.name?.trim() || "Unknown User",
-        changes
-      })
-    });
-
-    const data = await res.json();
-    alert(data.message);
-
-    window.location.href="userDashboard.html";
-
-  }catch(err){
-    console.error(err);
-    alert("Error sending request");
+  if(Object.keys(changes).length===0){
+    alert("No changes detected");
+    return;
   }
+
+  await fetch("http://localhost:5000/edit-request",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({
+      residentId:residentData._id,
+      requestedBy:residentData.head.name,
+      changes
+    })
+  });
+
+  alert("Request submitted!");
+  window.location.href="userDashboard.html";
 }
+
+/* DARK MODE */
+function toggleDark(){
+  document.body.classList.toggle("dark");
+  localStorage.setItem("darkMode",document.body.classList.contains("dark"));
+}
+if(localStorage.getItem("darkMode")==="true"){
+  document.body.classList.add("dark");
+}
+
+/* AGE AUTO */
+document.addEventListener("input",e=>{
+  if(e.target.classList.contains("memberBirthdate")){
+    const d=new Date(e.target.value);
+    e.target.nextElementSibling.value=new Date().getFullYear()-d.getFullYear();
+  }
+});
 </script>
 
 </body>
