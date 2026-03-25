@@ -314,22 +314,22 @@ function renderChart(data){
 
 /* RENDER */
 function renderResidents(data){
-    const c=residentList;
-    c.innerHTML="";
+    const c = residentList;
+    c.innerHTML = "";
 
     if(!data.length){
-        c.innerHTML="<p>No residents found</p>";
+        c.innerHTML = "<p>No residents found</p>";
         return;
     }
 
-    data.forEach(r=>{
-        const div=document.createElement("div");
-        div.className="resident";
+    data.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "resident";
 
-        div.innerHTML=`
-            <h3>${r.head?.name||"No Name"}</h3>
-            <p>Age: ${r.head?.age||"N/A"}</p>
-            <p>Family: ${r.familyMembers?.length||0}</p>
+        div.innerHTML = `
+            <h3>${r.head?.name || "No Name"}</h3>
+            <p>Age: ${r.head?.age || "N/A"}</p>
+            <p>Family: ${r.familyMembers?.length || 0}</p>
 
             <div class="actions">
                 <button class="view" onclick="viewProfile('${r._id}')">View</button>
