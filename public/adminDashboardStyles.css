@@ -3,38 +3,27 @@
   font-family: Arial, sans-serif; 
 }
 
-body {
-  margin: 0;
-  background: transparent;
-  transition: background .3s, color .3s;
+body { 
+  margin: 0; 
+  background: #f4f6f9; 
+  transition: background .3s, color .3s; 
 }
 
-/* BACKGROUND IMAGE + OVERLAY */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
-    url("images/bg.png") no-repeat center center/cover;
-  z-index: -1;
+body.dark { 
+  background: #121212; 
+  color: #e4e4e4; 
 }
 
 /* SIDEBAR */
 .sidebar {
-  position: fixed; left: 0; top: 0; bottom: 0;
-  width: 230px; background: #1f2a44; color: #fff; padding: 20px;
-  position: fixed;
-  left: 0;
-  top: 0;
+  position: fixed; 
+  left: 0; 
+  top: 0; 
   bottom: 0;
-  width: 230px;
+  width: 230px; 
+  background: #1f2a44; 
+  color: #fff; 
   padding: 20px;
-  color: #fff;
-
-  background:
-    linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
-    url("images/loading.png") no-repeat center center/cover;
 }
 
 body.dark .sidebar { background: #0d1528; }

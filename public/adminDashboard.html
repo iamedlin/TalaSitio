@@ -23,31 +23,18 @@ body {
 
 /* SIDEBAR */
 .sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 230px;
+  width: 250px;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e3c72, #2a5298);
+  color: white;
   padding: 20px;
-  color: #fff;
-
-  background: linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
-  url ("images/loading.png") no-repeat center center/cover;
+  position: fixed;
 }
-
-body.dark .sidebar { background: #0d1528; }
-
-.sidebar a{
-  display:block; color: #cfd8ff; padding: 10px; border-radius: 8px; margin: 6px 0; cursor: pointer; text-decoration: none; }
-
-  .sidebar a:hover { background: #2f3b63; }
 
 .sidebar h2 {
   text-align: center;
   margin-bottom: 30px;
 }
-
-.logo-title { display: flex; align-items: center; gap: 10px; } .logo-title img { width: 70px; height: 70px; object-fit: contain; }
 
 .sidebar a {
   display: block;
@@ -211,7 +198,8 @@ body.dark .sitio-btn {
 <body>
 
 <!-- SIDEBAR -->
-<div class="sidebar"> <h2 class="logo-title"> <img src="images/loading.png" alt="Logo"> TalaSitio </h2>
+<div class="sidebar">
+  <h2>🏡 TalaSitio</h2>
   <a onclick="showSection('dashboard')">📊 Dashboard</a>
   <a href="settings.html">⚙️ Settings</a> 
   <a onclick="openLogoutModal()">🚪 Logout</a>
