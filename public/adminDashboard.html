@@ -131,90 +131,87 @@ function logout(){
 function goToSitio(number){ 
   window.location.href = `sitio.html?sitio=${number}`; 
 }
-
-// Requests Box
-function toggleRequestsBox(){
-  const box = document.getElementById("requestBox");
-  box.style.display = box.style.display==='block' ? 'none':'block';
-  if(box.style.display==='block') fetchRequests();
-}
-
-// Fetch requests from server
-async function fetchRequests(){
-  const res = await fetch("http://localhost:5000/edit-requests");
-  const data = await res.json();
-
-   const box = document.getElementById("requestBox");
-
-    box.innerHTML = data.map(req => `
-        <div class="card">
-            <p>Resident ID: ${req.residentId}</p>
-            <p>Status: ${req.status}</p>
-            <button onclick="approve('${req._id}')">Approve</button>
-        </div>
-    `).join("");
-}
-
-function approveEdit(id) {
-    fetch(`http://localhost:5000/edit-request/approve/${id}`, {
-        method: "PUT"
-    })
-    .then(res => res.json())
-    .then(data => {
-        alert(data.message);
-        fetchRequests(); // refresh
-    });
-}
-
-async function approveRequest(id){
-  try {
-    await fetch(`http://localhost:5000/approve-request/${id}`, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    fetchRequests();
-  } catch (err) {
-    console.error("Error approving request:", err);
-  }
-}
-
-// Toggle request box and fetch requests
+// Toggle request box
 function toggleRequestsBox(){
     const box = document.getElementById("requestBox");
-    box.style.display = box.style.display==='block' ? 'none':'block';
-    if(box.style.display==='block') fetchRequests();
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
+
+    if(box.style.display === 'block'){
+        fetchRequests();
+    }
 }
 
-// Fetch edit requests
+// Fetch requests
 async function fetchRequests(){
     try {
-        const response = await fetch("http://localhost:5000/edit-requests");
-        const requests = await response.json();
+        const res = await fetch("http://localhost:5000/edit-requests");
+        const requests = await res.json();
+
+        console.log("REQUESTS:", requests); // DEBUG
 
         const list = document.getElementById("requestList");
         list.innerHTML = "";
 
+        if(!requests.length){
+            list.innerHTML = "<p>No requests found</p>";
+            return;
+        }
+
         requests.forEach(req => {
             const div = document.createElement("div");
+            div.classList.add("card");
+
             div.innerHTML = `
                 <p><b>Resident ID:</b> ${req.residentId}</p>
-                <p>Status: ${req.status}</p>
-                ${req.status === "pending" ? `<button onclick="approveEdit('${req._id}')">Approve</button>` : `<small>✔ ${req.status}</small>`}
+                <p><b>Requested By:</b> ${req.requestedBy || "N/A"}</p>
+                <p><b>Status:</b> ${req.status}</p>
+
+                ${
+                 req.status === "pending" 
+  ? `<button onclick="approveEdit('${req._id}')">Approve</button>` 
+  : `<small>✔ ${req.status}</small>`
+}
+
+<button onclick="deleteRequest('${req._id}')" style="background:red;">Delete</button>
             `;
+
             list.appendChild(div);
         });
+
     } catch (err) {
         console.error("Error fetching requests:", err);
     }
 }
 
+// Approve
 function approveEdit(id){
   fetch(`http://localhost:5000/edit-request/approve/${id}`, {
     method: "PUT"
   })
   .then(res => res.json())
-  .then(() => fetchRequests());
+  .then(data => {
+    alert(data.message || "Approved!");
+    fetchRequests();
+  })
+  .catch(err => console.error(err));
 }
+
+// Delete
+function deleteRequest(id){
+  if(!confirm("Delete this request?")) return;
+
+  fetch(`http://localhost:5000/edit-request/${id}`, {
+    method: "DELETE"
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message || "Deleted!");
+    fetchRequests();
+  })
+  .catch(err => console.error(err));
+}
+
+
 </script>
 
 </body>
