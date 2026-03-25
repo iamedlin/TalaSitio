@@ -13,8 +13,13 @@ dotenv.config();
 connectDB();
 
 const app = express();
+const mongoose = require("mongoose");
+const nodemailer = require("nodemailer");
 
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5000", // just the protocol + host + port
+    credentials: true
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/auth", authRoutes);
@@ -330,8 +335,72 @@ app.delete("/residents/:id", async (req, res) => {
     }
 });
 
-const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+// -------- Send Verification Code --------
+app.post("/forgot-password", async (req, res) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "Email not found" });
+
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Save code & expiry (10 minutes)
+    user.resetCode = verificationCode;
+    user.resetCodeExpires = Date.now() + 10 * 60 * 1000;
+    await user.save();
+
+    // Configure Nodemailer
+    let transporter = nodemailer.createTransport({
+        service: "Gmail",
+        auth: {
+            user: "itsedielynnase@gmail.com",
+            pass: "ipro yzvv onps zilm"  // <- make sure this app password is still valid
+        }
+    });
+
+    const mailOptions = {
+        from: '"My App" <itsedielynnase@gmail.com>',
+        to: email,
+        subject: "Password Reset Verification Code",
+        text: `Your password reset code is: ${verificationCode}`
+    };
+
+    try {
+        await transporter.sendMail(mailOptions);
+        res.json({ message: "Verification code sent to your email" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Failed to send email" });
+    }
 });
+
+// -------- Verify Code & Reset Password --------
+app.post("/reset-password", async (req, res) => {
+    const { email, code, newPassword } = req.body;
+    console.log("Reset-password request body:", req.body); // 🔥 log input
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) return res.status(404).json({ message: "Email not found" });
+
+        if (!user.resetCode || user.resetCode !== code || user.resetCodeExpires < Date.now()) {
+            return res.status(400).json({ message: "Invalid or expired code" });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        user.resetCode = undefined;
+        user.resetCodeExpires = undefined;
+
+        await user.save();
+
+        res.json({ message: "Password has been reset successfully!" });
+    } catch (err) {
+        console.error("Reset-password route error:", err); // 🔥 full error
+        res.status(500).json({ message: "Server error", error: err.message });
+    }
+});
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
