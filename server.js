@@ -307,27 +307,20 @@ app.put("/residents/:id", async (req, res) => {
 /* =========================
    DELETE RESIDENT
 ========================= */
-app.delete("/residents/:id", async (req, res) => {
-    try {
-        const resident = await Resident.findById(req.params.id);
+app.delete("/edit-request/:id", async (req, res) => {
+  try {
+    const deleted = await EditRequest.findByIdAndDelete(req.params.id);
 
-        if (!resident) {
-            return res.status(404).json({ message: "Not found" });
-        }
-
-        await Resident.findByIdAndDelete(req.params.id);
-
-        const email = resident.head.email;
-
-        if (email) {
-            await User.findOneAndDelete({ email });
-        }
-
-        res.json({ message: "Deleted" });
-
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+    if (!deleted) {
+      return res.status(404).json({ message: "Request not found" });
     }
+
+    res.json({ message: "Request deleted successfully" });
+
+  } catch (err) {
+    console.error("DELETE ERROR:", err);
+    res.status(500).json({ message: "Error deleting request" });
+  }
 });
 
 app.get("/residents/by-email/:email", async (req, res) => {
