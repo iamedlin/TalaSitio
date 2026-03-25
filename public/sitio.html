@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>TalaSitio Pro</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -40,61 +40,22 @@ body{
 }
 
 /* ===== SIDEBAR ===== */
-.sidebar {
-    width: 200px;
-    height: 100vh;
-    position: fixed;
-    padding: 20px;
-    color: blue;
-
-    background: 
-        linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
-        url("images/loading.png") no-repeat center center/cover;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+.sidebar{
+    width:240px;
+    height:100vh;
+    background:linear-gradient(180deg,#1e3a5f,#0f172a);
+    color:white;
+    padding:20px;
 }
 
-.sidebar-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.sidebar-logo {
-    width: 90px;
-    height: 90px;
-    object-fit: contain;
-    margin-bottom: 20px;
-}
-
-.sidebar h2 {
-    writing-mode: vertical-rl;
-    text-orientation: upright;
-    font-size: 40px;
-    font-weight: 800;
-    letter-spacing: 6px;
-    font-family: 'Oswald', sans-serif;
-
-    background: linear-gradient(180deg, #e9cece, #4040dd);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.sidebar a {
-    color: white;
-    text-decoration: none;
-    display: block;
-    margin: 10px 0;
-    cursor: pointer;
+.sidebar h2{
+    text-align:center;
 }
 
 /* ===== MAIN ===== */
-.main {
-    margin-left: 220px; /* match sidebar width + some padding */
-    padding: 20px;
+.main{
+    flex:1;
+    padding:20px;
 }
 
 /* ===== TOP BAR ===== */
@@ -203,10 +164,7 @@ button:hover{
 <body>
 
 <div class="sidebar">
-  <div class="sidebar-content">
-    <img src="images/loading.png" alt="Logo" class="sidebar-logo">
-    <h2>TALASITIO</h2>
-  </div>
+    <h2>TalaSitio</h2>
 </div>
 
 <div class="main">
