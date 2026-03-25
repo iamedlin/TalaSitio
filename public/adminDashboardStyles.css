@@ -61,13 +61,17 @@ body.dark .card { background: #1e1e1e; }
   border-radius: 8px; border: none;
   cursor: pointer; background: #1f2a44; color: #fff;
   transition: background 0.2s;
-}
 
-.sitio-btn:hover { 
-  background: #2f3b63; 
-  transform: scale(1.08);
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
 }
+.sitio-btn {
+  padding: 16px 24px;
+  font-size: 18px;
+  border-radius: 8px; border: none;
+  cursor: pointer; background: #1f2a44; color: #fff;
+  transition: background 0.2s;
+}
+.sitio-btn:hover { background: #2f3b63; }
+
 /* TABLE */
 table {
   width: 100%; border-collapse: collapse;
