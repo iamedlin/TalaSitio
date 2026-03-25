@@ -274,7 +274,7 @@ app.post("/residents", async (req, res) => {
 /* =========================
    UPDATE RESIDENT
 ========================= */
-// PUT /residents/:id
+// UPDATE RESIDENT
 app.put("/residents/:id", async (req, res) => {
     const { head, familyMembers } = req.body;
     const resident = await Resident.findById(req.params.id);
@@ -294,7 +294,8 @@ app.put("/residents/:id", async (req, res) => {
         email: head.email,
         occupation: head.occupation,
         socialClass: head.socialClass,
-        religion: head.religion
+        religion: head.religion,
+        name: [head.firstName, head.middleName, head.lastName].filter(n => n).join(" ") // ← ADD THIS
     };
 
     // Update family members
@@ -303,7 +304,6 @@ app.put("/residents/:id", async (req, res) => {
     await resident.save();
     res.json(resident);
 });
-
 /* =========================
    DELETE RESIDENT
 ========================= */
