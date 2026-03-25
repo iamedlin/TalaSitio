@@ -96,6 +96,7 @@
 </div>
 
 <script>
+const nodemailer = require("nodemailer");
 const token = localStorage.getItem("token");
 if(!token) window.location.href="login.html";
 
@@ -141,6 +142,14 @@ function toggleRequestsBox(){
     }
 }
 
+const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+        user: "itsedielynnase@gmail.com",
+        pass: "ipro yzvv onps zilm"  // make sure this app password is valid
+    }
+});
+
 // Fetch requests
 async function fetchRequests(){
     try {
@@ -158,31 +167,47 @@ async function fetchRequests(){
         }
 
         requests.forEach(req => {
-            const div = document.createElement("div");
-            div.classList.add("card");
+    const div = document.createElement("div");
+    div.classList.add("card");
 
-            div.innerHTML = `
-                <p><b>Resident ID:</b> ${req.residentId}</p>
-                <p><b>Requested By:</b> ${req.requestedBy || "N/A"}</p>
-                <p><b>Status:</b> ${req.status}</p>
+    div.innerHTML = `
+        <p><b>Resident ID:</b> ${req.residentId}</p>
+        <p><b>Requested By:</b> ${req.requestedBy || "N/A"}</p>
+        <p><b>Status:</b> ${req.status}</p>
 
-                ${
-                 req.status === "pending" 
-  ? `<button onclick="approveEdit('${req._id}')">Approve</button>` 
-  : `<small>✔ ${req.status}</small>`
-}
+        ${
+            req.status === "pending" 
+            ? `
+                <button onclick="approveEdit('${req._id}')">Approve</button>
+                <button onclick="rejectEdit('${req._id}')" style="background:orange;">Reject</button>
+            `
+            : `<small>✔ ${req.status}</small>`
+        }
 
-<button onclick="deleteRequest('${req._id}')" style="background:red;">Delete</button>
-            `;
+        <button onclick="deleteRequest('${req._id}')" style="background:red;">Delete</button>
+    `;
 
-            list.appendChild(div);
-        });
+    list.appendChild(div);
+});
 
     } catch (err) {
         console.error("Error fetching requests:", err);
     }
 }
+// Reject
+function rejectEdit(id){
+  if(!confirm("Are you sure you want to reject this request?")) return;
 
+  fetch(`http://localhost:5000/edit-request/reject/${id}`, {
+    method: "PUT"
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert(data.message || "Rejected!");
+    fetchRequests();
+  })
+  .catch(err => console.error(err));
+}
 // Approve
 function approveEdit(id){
   fetch(`http://localhost:5000/edit-request/approve/${id}`, {
