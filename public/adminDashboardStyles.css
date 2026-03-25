@@ -167,14 +167,6 @@ body.dark .settings-box { background: #1e1e1e; }
   background: #1f2a44;
   color: #fff;
   font-size: 16px;
-}
-.request-item {
-    border-bottom: 1px solid #ddd;
-    padding: 10px;
-}
-
-.request-item:hover {
-    background: #f5f5f5;
   transition: 0.3s;
 }
 
