@@ -6,6 +6,8 @@
 </head>
 <body>
 
+<button class="back-btn" onclick="goBack()">⬅ Back</button>
+
 <div class="form-wrapper">
 
     <form id="residentForm" class="form-card">
@@ -76,6 +78,10 @@
 </div>
 
 <script>
+
+function goBack() {
+    window.history.back();
+}
 
 const token = localStorage.getItem("token");
 
