@@ -274,18 +274,34 @@ app.post("/residents", async (req, res) => {
 /* =========================
    UPDATE RESIDENT
 ========================= */
+// PUT /residents/:id
 app.put("/residents/:id", async (req, res) => {
-    try {
-        const updated = await Resident.findByIdAndUpdate(
-            req.params.id,  // use id from URL
-            { $set: req.body },  // update with body
-            { new: true } // return updated document
-        );
+    const { head, familyMembers } = req.body;
+    const resident = await Resident.findById(req.params.id);
+    if (!resident) return res.status(404).send("Resident not found");
 
-        res.json(updated);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
+    // Update head info
+    resident.head = {
+        firstName: head.firstName,
+        middleName: head.middleName,
+        lastName: head.lastName,
+        birthdate: head.birthdate,
+        age: head.age,
+        gender: head.gender,
+        civilStatus: head.civilStatus,
+        nationality: head.nationality,
+        contact: head.contact,
+        email: head.email,
+        occupation: head.occupation,
+        socialClass: head.socialClass,
+        religion: head.religion
+    };
+
+    // Update family members
+    resident.familyMembers = familyMembers;
+
+    await resident.save();
+    res.json(resident);
 });
 
 /* =========================

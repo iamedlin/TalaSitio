@@ -43,39 +43,36 @@ const token = localStorage.getItem("token");
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-async function loadProfile(){
-
-    const res = await fetch("http://localhost:5000/residents/sitio/1", {
+async function loadProfile() {
+    const res = await fetch(`http://localhost:5000/residents/${id}`, {
         headers: { "Authorization": `Bearer ${token}` }
     });
 
-    const data = await res.json();
-    const resident = data.find(r => r._id === id);
+    if (!res.ok) return;
+    const resident = await res.json();
+    const head = resident.head || {};
 
-    if(!resident) return;
+    // Build full name
+    let fullName = [head.firstName, head.middleName, head.lastName].filter(n => n).join(" ");
+    if (!fullName && head.name) fullName = head.name;
 
-    const head = resident.head;
+    document.getElementById("fullName").innerText = fullName || "No name available";
 
-    document.getElementById("fullName").innerText = head.name;
-
-    // USER INFO
     document.getElementById("userInfo").innerHTML = `
         <p><b>Age:</b> ${head.age || "-"}</p>
         <p><b>Gender:</b> ${head.gender || "-"}</p>
         <p><b>Civil Status:</b> ${head.civilStatus || "-"}</p>
         <p><b>Birthdate:</b> ${head.birthdate ? new Date(head.birthdate).toLocaleDateString() : "-"}</p>
-       <p><b>Occupation:</b> ${head.occupation || "-"} </p>
-      `;
+        <p><b>Occupation:</b> ${head.occupation || "-"}</p>
+    `;
 
-    // CONTACT
     document.getElementById("contactInfo").innerHTML = `
-         <p><b>Contact:</b> ${head.contact || "-"}</p>
+        <p><b>Contact:</b> ${head.contact || "-"}</p>
         <p><b>Email:</b> ${head.email || "-"}</p>
     `;
 
-    // FAMILY (FULL DETAILS)
     document.getElementById("familyList").innerHTML =
-        resident.familyMembers.map((m, index) => `
+        (resident.familyMembers || []).map(m => `
             <div class="family-card">
                 <p><b>Name:</b> ${m.name}</p>
                 <p><b>Relation:</b> ${m.relation}</p>
@@ -84,16 +81,7 @@ async function loadProfile(){
             </div>
         `).join("");
 }
-
-function editProfile(){
-    window.location.href = `editResident.html?id=${id}`;
-}
-
-function goBack(){
-    window.location.href = "sitio.html?sitio=" + localStorage.getItem("sitioId");
-}
-
-loadProfile();
+loadProfile()
 </script>
 
 </body>
