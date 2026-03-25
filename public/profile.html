@@ -37,7 +37,6 @@
     </div>
 
 </div>
-
 <script>
 const token = localStorage.getItem("token");
 const params = new URLSearchParams(window.location.search);
@@ -52,7 +51,6 @@ async function loadProfile() {
     const resident = await res.json();
     const head = resident.head || {};
 
-    // Build full name
     let fullName = [head.firstName, head.middleName, head.lastName].filter(n => n).join(" ");
     if (!fullName && head.name) fullName = head.name;
 
@@ -81,8 +79,17 @@ async function loadProfile() {
             </div>
         `).join("");
 }
-loadProfile()
-</script>
 
+function goBack() {
+    const sitioId = localStorage.getItem("sitioId");
+    if (sitioId) {
+        window.location.href = `sitio.html?sitio=${sitioId}`;
+    } else {
+        window.history.back();
+    }
+}
+
+loadProfile();
+</script>
 </body>
 </html>
