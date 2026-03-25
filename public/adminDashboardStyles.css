@@ -167,4 +167,10 @@ body.dark .settings-box { background: #1e1e1e; }
   background: #1f2a44;
   color: #fff;
   font-size: 16px;
+  transition: 0.3s;
+}
+
+.notification-btn:hover {
+  transform: scale(1.1);
+  background: #2f3b63;
 }

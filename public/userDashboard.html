@@ -47,6 +47,28 @@ color:white;
 cursor:pointer;
 }
 
+.input-group {
+    position: relative;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    padding-right: 40px; /* space for icon */
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.input-group span {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 18px;
+}
+
 </style>
 
 </head>
@@ -66,6 +88,21 @@ cursor:pointer;
 <div class="card">
     <h3>Loading...</h3>
     <p>Please wait...</p>
+</div>
+<div id="passwordSection" class="password-card" style="display: none;">
+    <h3>Change Password</h3>
+
+    <div class="input-group">
+        <input type="password" id="currentPassword" placeholder="Current Password">
+        <span onclick="togglePassword('currentPassword', this)">👁️</span>
+    </div>
+
+    <div class="input-group">
+        <input type="password" id="newPassword" placeholder="New Password">
+        <span onclick="togglePassword('newPassword', this)">👁️</span>
+    </div>
+
+    <button onclick="changePassword()">Update Password</button>
 </div>
 
 <script>
@@ -104,7 +141,9 @@ function requestEdit(residentId) {
     })
     .catch(err => console.error(err));
 }
-
+function goToEdit(){
+    window.location.href = "edit.html";
+}
 // Fetch current user info
 async function getCurrentUser() {
     try {
@@ -142,7 +181,8 @@ async function getCurrentUser() {
             `).join("")}
 
             <br>
-            <button onclick="requestEdit('${resident._id}')">Edit Info</button>
+            <button onclick="goToEdit()">Edit Info</button>
+<button onclick="toggleChangePassword()">Change Password</button>
         `;
 
     } catch (err) {
@@ -151,6 +191,63 @@ async function getCurrentUser() {
     }
 }
 getCurrentUser();
+
+async function changePassword() {
+    const currentPassword = document.getElementById("currentPassword").value;
+    const newPassword = document.getElementById("newPassword").value;
+
+    if (!currentPassword || !newPassword) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    try {
+        const res = await fetch("http://localhost:5000/api/auth/change-password", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                currentPassword,
+                newPassword
+            })
+        });
+
+        const data = await res.json();
+        alert(data.message);
+
+        if (res.ok) {
+            document.getElementById("currentPassword").value = "";
+            document.getElementById("newPassword").value = "";
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Error changing password");
+    }
+}
+function togglePassword(inputId, el) {
+    const input = document.getElementById(inputId);
+
+    if (input.type === "password") {
+        input.type = "text";
+        el.textContent = "🙈";
+    } else {
+        input.type = "password";
+        el.textContent = "👁️";
+    }
+}
+function toggleChangePassword() {
+    const section = document.getElementById("passwordSection");
+
+    if (section.style.display === "none") {
+        section.style.display = "block";
+    } else {
+        section.style.display = "none";
+    }
+}
+
 </script>
 </body>
 </html>
