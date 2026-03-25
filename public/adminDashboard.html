@@ -55,13 +55,23 @@ body.dark .card { background: #1e1e1e; }
 .card p { font-size: 36px; font-weight: bold; margin: 0; }
 
 /* SITIO BUTTONS */
-.sitio-container { margin-top: 25px; margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.sitio-container { 
+    margin-top: 25px; 
+    margin-bottom: 20px; 
+    display: flex; 
+    gap: 15px; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+}
 .sitio-btn {
-  padding: 16px 24px;
-  font-size: 18px;
-  border-radius: 8px; border: none;
-  cursor: pointer; background: #1f2a44; color: #fff;
-  transition: background 0.2s;
+    padding: 18px 28px; /* bigger buttons */
+    font-size: 20px;    /* larger text */
+    border-radius: 10px; 
+    border: none;
+    cursor: pointer; 
+    background: #1f2a44; 
+    color: #fff;
+    transition: background 0.2s;
 }
 .sitio-btn:hover { background: #2f3b63; }
 
@@ -157,8 +167,17 @@ body.dark .settings-box { background: #1e1e1e; }
 </div>
 
   <!-- DASHBOARD -->
-  <div id="dashboard" class="section active">
-    <!-- Sitio Buttons -->
+<div id="dashboard" class="section active">
+
+    <!-- CARDS FIRST -->
+    <div class="cards">
+      <div class="card"><h3>Total Residents</h3><p>1,254</p></div>
+      <div class="card"><h3>Pending Requests</h3><p>18</p></div>
+      <div class="card"><h3>Approved Today</h3><p>7</p></div>
+      <div class="card"><h3>Households</h3><p>362</p></div>
+    </div>
+
+    <!-- SITIO BUTTONS BELOW -->
     <div class="sitio-container">
       <button class="sitio-btn" onclick="goToSitio(1)">Sitio 1</button>
       <button class="sitio-btn" onclick="goToSitio(2)">Sitio 2</button>
@@ -167,13 +186,7 @@ body.dark .settings-box { background: #1e1e1e; }
       <button class="sitio-btn" onclick="goToSitio(5)">Sitio 5</button>
     </div>
 
-    <div class="cards">
-      <div class="card"><h3>Total Residents</h3><p>1,254</p></div>
-      <div class="card"><h3>Pending Requests</h3><p>18</p></div>
-      <div class="card"><h3>Approved Today</h3><p>7</p></div>
-      <div class="card"><h3>Households</h3><p>362</p></div>
-    </div>
-  </div>
+</div>
 
   <!-- RESIDENTS -->
   <div id="residents" class="section">
