@@ -118,6 +118,7 @@ body.dark select {
 </div>
 
 <script>
+
 const token = localStorage.getItem("token");
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
@@ -215,8 +216,7 @@ async function saveChanges(){
 
     alert("Updated successfully!");
 
-    // 🔥 IMPORTANT: reload data instead of redirect
-    await loadData();
+window.location.href = "profile.html";
 }
 
 /* ADD */

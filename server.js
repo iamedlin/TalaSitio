@@ -339,6 +339,26 @@ app.get("/residents/by-email/:email", async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 });
+/* =========================
+   DELETE RESIDENT
+========================= */
+app.delete("/residents/:id", async (req, res) => {
+    try {
+        const deleted = await Resident.findByIdAndDelete(req.params.id);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Resident not found" });
+        }
+
+        // Optional: delete the associated user too
+        await User.findOneAndDelete({ email: deleted.head.email });
+
+        res.json({ message: "Resident deleted successfully" });
+    } catch (err) {
+        console.error("DELETE RESIDENT ERROR:", err);
+        res.status(500).json({ message: "Error deleting resident" });
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 
