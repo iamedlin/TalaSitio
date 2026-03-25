@@ -51,11 +51,17 @@ async function loadProfile() {
     const resident = await res.json();
     const head = resident.head || {};
 
-    let fullName = [head.firstName, head.middleName, head.lastName].filter(n => n).join(" ");
-    if (!fullName && head.name) fullName = head.name;
+    let fullName = "";
 
-    document.getElementById("fullName").innerText = fullName || "No name available";
+if (head.firstName || head.middleName || head.lastName) {
+    fullName = [head.firstName, head.middleName, head.lastName].filter(n => n).join(" ");
+} else if (head.name) {
+    fullName = head.name;
+} else {
+    fullName = "No name available";
+}
 
+document.getElementById("fullName").innerText = fullName;
     document.getElementById("userInfo").innerHTML = `
         <p><b>Age:</b> ${head.age || "-"}</p>
         <p><b>Gender:</b> ${head.gender || "-"}</p>
@@ -87,6 +93,10 @@ function goBack() {
     } else {
         window.history.back();
     }
+}
+
+function editProfile() {
+    window.location.href = `editResident.html?id=${id}`;
 }
 
 loadProfile();
