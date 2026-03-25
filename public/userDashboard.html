@@ -11,7 +11,19 @@ font-family:Arial;
 margin:0;
 background:#f4f4f4;
 }
+.profile-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+}
 
+.profile-card{
+    background:white;
+    padding:20px;
+    border-radius:8px;
+    margin-bottom:20px;
+}
 .header{
 background:#2c7be5;
 color:white;
@@ -167,23 +179,53 @@ async function getCurrentUser() {
         const resident = await residentRes.json();
 
         // 3. DISPLAY DATA
-        document.querySelector(".card").innerHTML = `
-            <h3>${resident.head.name}</h3>
-            <p>Email: ${resident.head.email}</p>
-            <p>Birthdate: ${resident.head.birthdate}</p>
+       document.querySelector(".card").innerHTML = `
+    <div class="profile-header">
+        <h2>${resident.head.name}</h2>
+    </div>
 
-            <h4>Family Members:</h4>
-            ${resident.familyMembers.map(member => `
+    <!-- USER INFO -->
+    <div class="profile-card">
+        <h3>USER INFORMATION</h3>
+        <p><b>Age:</b> ${resident.head.age || "-"}</p>
+        <p><b>Gender:</b> ${resident.head.gender || "-"}</p>
+        <p><b>Civil Status:</b> ${resident.head.civilStatus || "-"}</p>
+        <p><b>Birthdate:</b> ${
+            resident.head.birthdate 
+            ? new Date(resident.head.birthdate).toLocaleDateString() 
+            : "-"
+        }</p>
+        <p><b>Occupation:</b> ${resident.head.occupation || "-"}</p>
+    </div>
+
+    <!-- CONTACT -->
+    <div class="profile-card">
+        <h3>CONTACT INFORMATION</h3>
+        <p><b>Contact:</b> ${resident.head.contact || "-"}</p>
+        <p><b>Email:</b> ${resident.head.email || "-"}</p>
+    </div>
+
+    <!-- FAMILY -->
+    <div class="profile-card">
+        <h3>FAMILY MEMBERS</h3>
+        ${
+            resident.familyMembers.length > 0
+            ? resident.familyMembers.map(member => `
                 <div class="resident-card">
-                    <p><b>${member.name}</b></p>
-                    <p>${member.birthdate}</p>
+                    <p><b>Name:</b> ${member.name}</p>
+                    <p><b>Relation:</b> ${member.relation}</p>
+                    <p><b>Age:</b> ${member.age || "-"}</p>
+                    <p><b>Occupation:</b> ${member.occupation || "-"}</p>
                 </div>
-            `).join("")}
+            `).join("")
+            : "<p>No family members</p>"
+        }
+    </div>
 
-            <br>
-            <button onclick="goToEdit()">Edit Info</button>
-<button onclick="toggleChangePassword()">Change Password</button>
-        `;
+    <br>
+    <button onclick="goToEdit()">Edit Info</button>
+    <button onclick="toggleChangePassword()">Change Password</button>
+`;
 
     } catch (err) {
         console.error(err);
