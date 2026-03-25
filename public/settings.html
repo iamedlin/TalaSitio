@@ -5,205 +5,317 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Settings - TalaSitio</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="adminDashboardStyles.css">
 
 <style>
+/* ---------- SIDEBAR ---------- */
+.sidebar {
+    width: 200px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 20px;
+    color: #cfd8ff;
+    background: 
+        linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
+        url("images/loading.png") no-repeat center center/cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.sidebar-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.sidebar-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 20px;
+}
+
+.sidebar h2 {
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    font-family: 'Oswald', sans-serif;
+    background: linear-gradient(180deg, #e9cece, #4040dd);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.sidebar a {
+    display: block;
+    margin: 15px 0;
+    padding: 10px 12px;
+    color: #cfd8ff;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: 0.3s;
+    cursor: pointer;
+}
+
+.sidebar a:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* ---------- MAIN WRAPPER ---------- */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+}
+
+.main-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    margin-left: 220px; /* space for sidebar */
+    padding-top: 50px;
+}
+
+/* WHITE CONTAINER */
 .container {
-  padding: 30px;
+    max-width: 900px;
+    padding: 40px 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    backdrop-filter: blur(8px);
 }
 
-.header {
-  margin-bottom: 20px;
+/* BACK BUTTON */
+.back-btn {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: bold;
+    color: #3498db;
+    margin-bottom: 25px;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
+.back-btn:hover {
+    color: #2a5298;
+    text-decoration: underline;
+}
+
+/* ACTION BUTTONS */
 .actions {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 25px;
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
 }
 
 .actions button {
-  padding: 12px 18px;
-  border: none;
-  background: #3498db;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
+    flex: 1;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #1f2a44, #2f3b63);
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
+.actions button:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+}
+
+/* CARDS */
 .card {
-  display: none;
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  max-width: 500px;
+    display: none;
+    background: #f7f9fc;
+    padding: 30px 25px;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 0 auto 30px auto;
+    transition: all 0.3s ease;
 }
 
 .card.active {
-  display: block;
+    display: block;
+    animation: fadeIn 0.5s ease forwards;
 }
 
+.card h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1f2a44;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* INPUTS */
 .card input, .card select {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: 0.3s;
 }
 
+.card input:focus, .card select:focus {
+    outline: none;
+    border-color: #2a5298;
+    box-shadow: 0 0 8px rgba(42,82,152,0.3);
+}
+
+/* CARD BUTTON */
 .card button {
-  width: 100%;
-  padding: 10px;
-  background: #2ecc71;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #2a5298, #1f2a44);
+    color: #fff;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.back-btn {
-  margin-bottom: 20px;
-  cursor: pointer;
-  color: #3498db;
+.card button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    background: linear-gradient(135deg, #1f2a44, #2a5298);
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 800px) {
+    .main-wrapper { margin-left: 0; }
+    .actions { flex-direction: column; }
+    .actions button { width: 100%; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
-  <div class="back-btn" onclick="goBack()">⬅ Back to Dashboard</div>
-
-  <!-- HELLO ADMIN -->
-  <div class="header">
-    <h2 id="greeting">Hello Admin 👋</h2>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-content">
+    <img src="images/loading.png" alt="Logo" class="sidebar-logo">
+    <h2>TALASITIO</h2>
   </div>
+</div>
 
-  <!-- ACTION BUTTONS -->
-  <div class="actions">
-    <button onclick="showCard('updateCard')">✏️ Update My Info</button>
-    <button onclick="showCard('addCard')">➕ Add New Account</button>
+<!-- MAIN CONTENT -->
+<div class="main-wrapper">
+
+  <!-- WHITE CONTAINER -->
+  <div class="container">
+
+    <div class="back-btn" onclick="goBack()">⬅ Back to Dashboard</div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="actions">
+      <button onclick="showCard('updateCard')">✏️ Update My Info</button>
+      <button onclick="showCard('addCard')">➕ Add New Account</button>
+    </div>
+
+    <!-- UPDATE INFO -->
+    <div id="updateCard" class="card">
+      <h3>Update My Info</h3>
+      <input id="myName" placeholder="Full Name">
+      <input id="myEmail" type="email" placeholder="Email">
+      <input id="myPassword" type="password" placeholder="New Password">
+      <button onclick="updateMyInfo()">Save Changes</button>
+    </div>
+
+    <!-- ADD ACCOUNT -->
+    <div id="addCard" class="card">
+      <h3>Add New Account</h3>
+      <input id="name" placeholder="Full Name">
+      <input id="email" type="email" placeholder="Email">
+      <input id="password" type="password" placeholder="Password">
+      <select id="role">
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button onclick="createAccount()">Create Account</button>
+    </div>
+
   </div>
-
-  <!-- UPDATE INFO -->
-  <div id="updateCard" class="card">
-    <h3>Update My Info</h3>
-
-    <input id="myName" placeholder="Full Name">
-    <input id="myEmail" type="email" placeholder="Email">
-    <input id="myPassword" type="password" placeholder="New Password">
-
-    <button onclick="updateMyInfo()">Save Changes</button>
-  </div>
-
-  <!-- ADD ACCOUNT -->
-  <div id="addCard" class="card">
-    <h3>Add New Account</h3>
-
-    <input id="name" placeholder="Full Name">
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-
-    <select id="role">
-      <option value="user">User</option>
-      <option value="admin">Admin</option>
-    </select>
-
-    <button onclick="createAccount()">Create Account</button>
-  </div>
-
 </div>
 
 <script>
 const token = localStorage.getItem("token");
 if(!token) window.location.href="login.html";
 
-// BACK
-function goBack(){
-  window.location.href = "adminDashboard.html";
-}
+function goBack(){ window.location.href = "adminDashboard.html"; }
 
-// SHOW CARD
 function showCard(id){
   document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
   document.getElementById(id).classList.add("active");
 }
 
-// LOAD CURRENT USER
 async function loadUser(){
   try {
     const res = await fetch("http://localhost:5000/api/auth/me", {
       headers: { "Authorization": `Bearer ${token}` }
     });
-
     const user = await res.json();
-
-    document.getElementById("greeting").textContent = `Hello ${user.name} 👋`;
-
     document.getElementById("myName").value = user.name;
     document.getElementById("myEmail").value = user.email;
-
-  } catch (err) {
-    console.error(err);
-  }
+  } catch (err) { console.error(err); }
 }
 
 loadUser();
 
-// UPDATE MY INFO
 async function updateMyInfo(){
   const name = document.getElementById("myName").value;
   const email = document.getElementById("myEmail").value;
   const password = document.getElementById("myPassword").value;
-
   try {
     const res = await fetch("http://localhost:5000/update-me", {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ name, email, password })
     });
-
     const data = await res.json();
     alert(data.message || "Updated!");
-
-  } catch (err) {
-    console.error(err);
-    alert("Error updating info");
-  }
+  } catch (err) { console.error(err); alert("Error updating info"); }
 }
 
-// CREATE ACCOUNT
 async function createAccount(){
   const name = document.getElementById("name").value;
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
   const role = document.getElementById("role").value;
-
-  if(!name || !email || !password){
-    alert("Fill all fields");
-    return;
-  }
-
+  if(!name || !email || !password){ alert("Fill all fields"); return; }
   try {
     const res = await fetch("http://localhost:5000/create-user", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({ name, email, password, role })
     });
-
     const data = await res.json();
     alert(data.message || "Account created!");
-
-  } catch (err) {
-    console.error(err);
-    alert("Error creating account");
-  }
+  } catch (err) { console.error(err); alert("Error creating account"); }
 }
 </script>
 
