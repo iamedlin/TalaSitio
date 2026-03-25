@@ -7,53 +7,37 @@
 
 <body>
 
-<div class="container">
-
-    <h1 class="title">Edit Resident</h1>
-
-    <!-- NAV TABS -->
-    <div class="tabs">
-        <button class="tab active" onclick="showTab('head')">Head Info</button>
-        <button class="tab" onclick="showTab('family')">Family Members</button>
+<div class="profile-container">
+    <div class="profile-header">
+        <h1>Edit Resident</h1>
     </div>
 
-    <!-- HEAD INFO -->
-    <div id="headTab" class="card active">
+    <div class="profile-card">
 
         <h3>HEAD INFORMATION</h3>
 
-        <div class="grid">
-            <input id="name" placeholder="Full Name">
-            <input id="birthdate" type="date">
-            <input id="age" type="number" readonly>
+        <input id="name" placeholder="Full Name"><br><br>
+        <input id="birthdate" type="date"><br><br>
+        <input id="age" type="number" readonly><br><br>
 
-            <input id="gender" placeholder="Gender">
-            <input id="civilStatus" placeholder="Civil Status">
-            <input id="nationality" placeholder="Nationality">
+        <input id="gender" placeholder="Gender"><br><br>
+        <input id="civilStatus" placeholder="Civil Status"><br><br>
+        <input id="nationality" placeholder="Nationality"><br><br>
 
-            <input id="contact" placeholder="Contact">
-            <input id="email" placeholder="Email">
+        <input id="contact" placeholder="Contact"><br><br>
+        <input id="email" placeholder="Email"><br><br>
 
-            <input id="occupation" placeholder="Occupation">
-            <input id="socialClass" placeholder="Social Class">
-            <input id="religion" placeholder="Religion">
-        </div>
-
-    </div>
-
-    <!-- FAMILY -->
-    <div id="familyTab" class="card">
+        <input id="occupation" placeholder="Occupation"><br><br>
+        <input id="socialClass" placeholder="Social Class"><br><br>
+        <input id="religion" placeholder="Religion"><br><br>
 
         <h3>FAMILY MEMBERS</h3>
-
         <div id="familyContainer"></div>
 
-        <button class="btn add" onclick="addFamilyMember()">+ Add Member</button>
+        <button onclick="addFamilyMember()">+ Add Member</button>
+        <button onclick="saveChanges()">💾 Save</button>
+
     </div>
-
-    <!-- SAVE -->
-    <button class="btn save" onclick="saveChanges()">💾 Save Changes</button>
-
 </div>
 
 <script>
@@ -61,25 +45,11 @@ const token = localStorage.getItem("token");
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
-const sitio = params.get("sitio");
+const sitio = params.get("sitio"); // ✅ FIX
 
 let residentData;
 
-/* TAB SWITCH */
-function showTab(tab){
-    document.querySelectorAll(".card").forEach(c => c.classList.remove("active"));
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-
-    if(tab === 'head'){
-        document.getElementById("headTab").classList.add("active");
-    } else {
-        document.getElementById("familyTab").classList.add("active");
-    }
-
-    event.target.classList.add("active");
-}
-
-/* LOAD */
+/* LOAD DATA */
 async function loadData(){
 
     const res = await fetch(`http://localhost:5000/residents/${id}`, {
@@ -88,13 +58,24 @@ async function loadData(){
 
     residentData = await res.json();
 
+    if (!residentData) {
+        alert("Resident not found");
+        return;
+    }
+
     const head = residentData.head;
 
-    Object.keys(head).forEach(key => {
-        if(document.getElementById(key)){
-            document.getElementById(key).value = head[key] || "";
-        }
-    });
+    document.getElementById("name").value = head.name || "";
+    document.getElementById("birthdate").value = head.birthdate || "";
+    document.getElementById("age").value = head.age || "";
+    document.getElementById("gender").value = head.gender || "";
+    document.getElementById("civilStatus").value = head.civilStatus || "";
+    document.getElementById("nationality").value = head.nationality || "";
+    document.getElementById("contact").value = head.contact || "";
+    document.getElementById("email").value = head.email || "";
+    document.getElementById("occupation").value = head.occupation || "";
+    document.getElementById("socialClass").value = head.socialClass || "";
+    document.getElementById("religion").value = head.religion || "";
 
     const container = document.getElementById("familyContainer");
     container.innerHTML = "";
@@ -134,7 +115,7 @@ async function saveChanges(){
         familyMembers: members
     };
 
-    await fetch(`http://localhost:5000/residents/${id}`, {
+    const res = await fetch(`http://localhost:5000/residents/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
@@ -143,7 +124,13 @@ async function saveChanges(){
         body: JSON.stringify(updated)
     });
 
+    if (!res.ok) {
+        alert("Update failed");
+        return;
+    }
+
     alert("Updated successfully!");
+
     window.location.href = `profile.html?id=${id}&sitio=${sitio}`;
 }
 
@@ -159,26 +146,19 @@ function addFamilyMember(data = null){
         <input type="number" class="memberAge" readonly value="${data?.age || ""}">
         <input class="memberRelation" placeholder="Relation" value="${data?.relation || ""}">
         <input class="memberOccupation" placeholder="Occupation" value="${data?.occupation || ""}">
-        <button class="remove" onclick="this.parentElement.remove()">✖</button>
+        <button type="button" onclick="this.parentElement.remove()">❌</button>
+        <hr>
     `;
 
     document.getElementById("familyContainer").appendChild(div);
 }
 
-/* AGE */
-document.addEventListener("input", function(e){
-    if(e.target.classList.contains("memberBirthdate")){
-        const birth = new Date(e.target.value);
-        const now = new Date();
-        let age = now.getFullYear() - birth.getFullYear();
-        e.target.nextElementSibling.value = age;
-    }
-});
-
+/* AGE AUTO */
 document.getElementById("birthdate").addEventListener("change", function(){
     const b = new Date(this.value);
     const now = new Date();
-    document.getElementById("age").value = now.getFullYear() - b.getFullYear();
+    let age = now.getFullYear() - b.getFullYear();
+    document.getElementById("age").value = age;
 });
 
 loadData();

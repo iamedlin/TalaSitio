@@ -3,14 +3,38 @@
   font-family: Arial, sans-serif; 
 }
 
-body { margin: 0; background: #f4f6f9; transition: background .3s, color .3s; }
-body.dark { background: #121212; color: #e4e4e4; }
+body {
+  margin: 0;
+  background: transparent;
+  transition: background .3s, color .3s;
+}
+
+/* BACKGROUND IMAGE + OVERLAY */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),
+    url("images/bg.png") no-repeat center center/cover;
+  z-index: -1;
+}
 
 /* SIDEBAR */
+/* SIDEBAR */
 .sidebar {
-  position: fixed; left: 0; top: 0; bottom: 0;
-  width: 230px; background: #1f2a44; color: #fff; padding: 20px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 230px;
+  padding: 20px;
+  color: #fff;
+
+  background: linear-gradient(rgb(3, 28, 77), rgba(75, 79, 85, 0.958)),
+  url("images/loading.png") no-repeat center center/cover;
 }
+
 body.dark .sidebar { background: #0d1528; }
 
 .sidebar a{
@@ -26,14 +50,32 @@ body.dark .sidebar { background: #0d1528; }
 .logo-title { display: flex; align-items: center; gap: 10px; } .logo-title img { width: 70px; height: 70px; object-fit: contain; }
 
 .sidebar a {
-  display: block; color: #cfd8ff; padding: 10px;
-  border-radius: 8px; margin: 6px 0;
-  cursor: pointer; text-decoration: none;
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin: 10px 0;
+  transition: 0.3s;
 }
-.sidebar a:hover { background: #2f3b63; }
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.2);
+}
+
 
 /* MAIN */
-.main { margin-left: 230px; padding: 20px; }
+/* MAIN */
+.main {
+  margin-left: 230px;               /* leave space for sidebar */
+  padding: 20px;
+  width: calc(100% - 230px);        /* fill remaining space */
+  min-height: 100vh;                /* cover full viewport height */
+  
+  /* PNG background */
+  background: url("images/bg.png") no-repeat center center;
+  background-size: cover;           /* scale to fill area */
+}
+
 
 .topbar {
   background: #fff; 
@@ -80,14 +122,46 @@ body.dark .card { background: #1e1e1e; }
 
 /* SITIO BUTTONS (LARGER) */
 .sitio-container {
-  margin-top: 25px; margin-bottom: 20px;
-  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 100px;       
+  margin-bottom: 40px;     
+
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 columns */
+  gap: 15px 5px;          /* 15px row gap, 5px column gap */
+  justify-items: center;    
+  padding: 20px;            
+  min-height: 400px;        
+  width: 80%;               /* container a bit wider */
+  margin-left: auto;
+  margin-right: auto;       
+}
+
+.sitio-btn {
+  width: 95%;               /* slightly smaller to fit in columns */
+  min-height: 90px;         
+  padding: 20px;            
+  font-size: 20px;          
+  font-weight: bold;
+
+  border-radius: 16px;
+  border: none;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #1f2a44, #2f3b63);
+  color: #fff;
+
+  display: flex;
+  align-items: center;
   justify-content: center;
 
   transition: all 0.3s ease;
 }
-.sitio-btn:hover { background: #2f3b63; }
 
+.sitio-btn:hover { 
+  background: #2f3b63; 
+  transform: scale(1.08);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
 /* TABLE */
 table {
   width: 100%; 
