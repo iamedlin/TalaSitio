@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f1f1f1;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Login Card */
+.login-card {
+    width: 380px;
+    background: #ffffff;
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Title */
+.login-card h2 {
+    font-size: 28px;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #2d2d2d;
+}
+
+/* Small text */
+.login-card p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.login-card p a {
+    color: #0a7c86;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* Form Layout */
+form {
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-size: 14px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+/* Input Fields */
+input[type="email"],
+input[type="password"] {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: #0a7c86;
+}
+
+/* Remember Me */
+.remember {
+    margin-top: 15px;
+    font-size: 14px;
+    color: #444;
+}
+
+/* Login Button */
+button {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 25px;
+    border: none;
+    background-color: #0a7c86;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    width: 120px;
+}
+
+button:hover {
+    background-color: #08656e;
+}
+
+/* Links under button */
+.links {
+    margin-top: 20px;
+    font-size: 13px;
+}
+
+.links a {
+    color: #0a7c86;
+    text-decoration: none;
+    margin-right: 10px;
+}
